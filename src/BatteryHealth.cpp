@@ -5,8 +5,6 @@
 BatteryHealth::BatteryHealth(){
     BatteryCharge = _BAT_VOLT_SENSE;
     PowerCharging = _CHARGE_VOLT_SENSE;
-
-    
 }
 
 BatteryHealth::BatteryHealth(int batterycharge, int powercharging)

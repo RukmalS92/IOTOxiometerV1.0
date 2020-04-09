@@ -64,19 +64,19 @@ void Oled::DisplayInit(){
     #ifdef USE_SERIAL_MONITOR
         Serial.println("System Initializing...");
     #endif
-    while((Display2ConnectionError = display2.begin(SSD1306_SWITCHCAPVCC, 0x3C)) != true){
+    
+    while((Display2ConnectionError = display2.begin(SSD1306_SWITCHCAPVCC, 0x3C)) != true ){
         #ifdef USE_SERIAL_MONITOR
             Serial.print("Connection display-2... "); Serial.println("0x3C"); 
         #endif
     }
-    /*
-    while((*errorflag = display1.begin(SSD1306_SWITCHCAPVCC, 0x3D)) != true){
+    while((Display1ConnectionError = display1.begin(SSD1306_SWITCHCAPVCC, 0x3D)) != true){
         #ifdef USE_SERIAL_MONITOR
-            Serial.print("Connection display-1... "); Serial.println(address); 
+            Serial.print("Connection display-1... "); Serial.println("0x3D"); 
         #endif
-    }*/
-    Oled::Display2StartupPage();
-    //Oled::Display2StartupPage();
+    }
+    Oled::Display2MonitorSceneSetup();
+    Oled::Display1MonitorSceneSetup();
     #ifdef USE_SERIAL_MONITOR
         Serial.println("System Initializing Comeplete!!!");
     #endif

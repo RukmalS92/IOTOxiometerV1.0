@@ -41,8 +41,6 @@ void Controller::AllDevicesInit(){
     Display.DisplayInit(); 
     /*Here Goes SpO2/BPM Init*/
     /*Here Goes BP Init*/
-    delay(3000);
-    Display.Display2MonitorSceneSetup();
 }
 
 void Controller::ReadNonDeviceVars(int* batteryHealth, int* wifistrength){

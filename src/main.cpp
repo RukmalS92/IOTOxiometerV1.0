@@ -57,6 +57,7 @@ long timebuf2 = 0;
 void setup() {
   Serial.begin(9600);
   while(!Serial);
+  /*
   mqttclient.SetupLocalIPV4(localIP, gateway, subnet);
   mqttclient.MqttInit();
   doc["devid"] = "client1";
@@ -66,7 +67,7 @@ void setup() {
   doc["dipre"] = "1.6";
   
   serializeJson(doc, jsonbuffer);
-  Serial.println(jsonbuffer);
+  Serial.println(jsonbuffer);*/
 
   controller.AllDevicesInit();
   button.ButtonInit();
