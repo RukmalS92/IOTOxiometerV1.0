@@ -75,19 +75,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  /*
-  if(millis() - timebuf > 1000){
-      mqttclient.MqttPublish("sensors", jsonbuffer);
-      mqttclient.GetWifiStrength();
-      timebuf = millis();
-  }
-  
-  if(millis() - timebuf2 > 1000){
-    controller.UpdateCyclicSystemData();
-    timebuf2 = millis();
-  }*/
-
   
   
   button.UpdateButton();
