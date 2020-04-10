@@ -64,13 +64,13 @@ void Controller::WriteDisplay1(){
 void Controller::WriteDisplay2(){
     if((millis() - Controller::I2CBusWriteTimeStamp) >= _I2CBUS_WR_DELAY){
         /*get spo2 data*/
-        Display.SetSPO2Display(BatteryHealth); // dummy
+        
         Controller::I2CBusWriteTimeStamp = millis();
         
     } 
     if((millis() - Controller::I2CBusWriteTimeStamp) >= _I2CBUS_WR_DELAY){
         /*get BPM data*/
-        Display.SetBPMDisplay(BatteryHealth); // dummy
+       
         Controller::I2CBusWriteTimeStamp = millis();
         
     } 
@@ -81,7 +81,7 @@ void Controller::UpdateCyclicPatientData(){
     if((millis() - Controller::CyclicPatientDataUpdateTimeStamp) > MAIN_CYCLE_UPDATE_TIME){
         Controller::WriteDisplay1();
         Controller::WriteDisplay2();
-        Display.UpdateDisplay2();
+        //isplay.UpdateDisplay2();
         Controller::CyclicPatientDataUpdateTimeStamp = millis();
     }
         
@@ -90,8 +90,7 @@ void Controller::UpdateCyclicPatientData(){
 //update every minute
 void Controller::UpdateCyclicSystemData(){
     if((millis() - Controller::CyclicSystemDataUpdateTimeStamp) > SYSTEM_UPDATE_TIME){
-        Display.SetWifiSignalDisplay(Controller::wifisignal);
-        Display.SetBatteryHealthDisplay(Controller::BatteryHealth);
+        
         Controller::CyclicSystemDataUpdateTimeStamp = millis();
     }
     
@@ -101,12 +100,12 @@ void Controller::UpdateCyclicSystemData(){
 //BP
 void Controller::UpdateDisplay1atRequest(){
     Controller::WriteDisplay1();
-    Display.UpdateDisplay2();
+    //Display.UpdateDisplay2();
 }
 //BPM and SpO2
 void Controller::UpdateDisplay2atRequest(){
     Controller::WriteDisplay2();
-    Display.UpdateDisplay2();
+    //Display.UpdateDisplay2();
 }
 
 /*-------------------UPDATE @ ButtonPress----------------------*/

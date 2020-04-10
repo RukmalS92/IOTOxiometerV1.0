@@ -21,21 +21,23 @@ class Oled{
         void Display2MonitorSceneSetup();
 
         //Setters
-        void SetWifiSignalDisplay(int signal);
-        void SetBatteryHealthDisplay(int batteryvoltagel);
-        void SetSPO2Display(int SPO2value);
-        void SetBPMDisplay(int HeartRate);
-        void SetBPMBitMap();
-        void SetBPressureDisplay(int SystolicP, int DiastolicP);
-        
+        void SetSPO2(int* value);
+        void SetBPM(int* value);
+        void SetBPressure(int* Sys, int* dias);
+        void SetBatteryVoltage(int* batvalue);
+        void SetWifiSignal(int* wifisignal);
+
         //Getters
         bool GetDisplay1ERROR();
         bool GetDisplay2ERROR();
 
-        void UpdateDisplay1();
-        void UpdateDisplay1(int *TimeStamp);
-        void UpdateDisplay2();
-        void UpdateDisplay2(int *TimeStamp);
+        //Updaters
+        void UpdatePatientDataDisplay1();
+        void UpdatePatientDataDisplay2();
+        void UpdateSystemDataDisplay1();
+        void UpdateSystemDataDisplay2();
+
+        
    
     private:
         Adafruit_SSD1306 display1;
@@ -46,6 +48,13 @@ class Oled{
         bool updaterequestdisplay1;
         bool updaterequestdisplay2;
 
+        //Internal VAraiables
+        int SPO2;
+        int HeartRate;
+        int PressureSystolic;
+        int PressureDiastolic;
+        int BatteryVoltage;
+        int WifiSignal;
         //value change ID
         int LastSPO2;
         int LastHeartRate;
@@ -61,7 +70,18 @@ class Oled{
         void Display1StartupPage();
         void Display2StartupPage();
 
-    
+        void ProcessWifiSignalDisplay();
+        void ProcessBatteryHealthDisplay();
+        void ProcessSetSPO2Display();
+        void ProcessSetBPMDisplay();
+        void ProcessSetBPMBitMap();
+        void ProcessSetBPressureDisplay();
+
+        void updatedisplay1();
+        void updatedisplay1(int *TimeStamp);
+        void updatedisplay2();
+        void updatedisplay2(int *TimeStamp);
+
     protected:
 };
 

@@ -82,14 +82,6 @@ void Oled::DisplayInit(){
     #endif
 }
 
-//get ERRORS
-bool Oled::GetDisplay1ERROR(){
-    return Oled::Display1ConnectionError;
-}
-
-bool Oled::GetDisplay2ERROR(){
-    return Oled::Display2ConnectionError;
-}
 
 //Startup Page for Display -2 spo2,BPM
 void Oled::Display2StartupPage(){
@@ -135,7 +127,6 @@ void Oled::Display2MonitorSceneSetup(){
     display2.setCursor(70, 32);
     display2.println("---");
     
-    Oled::SetWifiSignalDisplay(90);
     display2.display();
 }
 
@@ -161,121 +152,120 @@ void Oled::Display1MonitorSceneSetup(){
     display1.display();
 }
 
-//wifiSignal
-void Oled::SetWifiSignalDisplay(int signal){
-    if(signal != LastWifisignal){
-        if(signal > 0 && signal <= 25){
-            display2.fillRect(0,0,4,12, BLACK);
-            display2.fillRect(0,12,4,4, WHITE);
-            display2.fillRect(6,0,16,16, BLACK);
+//wifiSignal --> Display1
+void Oled::ProcessWifiSignalDisplay(){
+    if(Oled::WifiSignal != LastWifisignal){
+        if(Oled::WifiSignal > 0 && Oled::WifiSignal <= 25){
+            display1.fillRect(0,0,4,12, BLACK);
+            display1.fillRect(0,12,4,4, WHITE);
+            display1.fillRect(6,0,16,16, BLACK);
         }
-        else if (signal > 25 && signal <= 50)
+        else if (Oled::WifiSignal > 25 && Oled::WifiSignal <= 50)
         {
-            display2.fillRect(0,0,4,12, BLACK);
-            display2.fillRect(0,12,4,4, WHITE);
-            display2.fillRect(6,0,4,8, BLACK);
-            display2.fillRect(6,8,4,8, WHITE);
-            display2.fillRect(12,0,10,16, BLACK);
+            display1.fillRect(0,0,4,12, BLACK);
+            display1.fillRect(0,12,4,4, WHITE);
+            display1.fillRect(6,0,4,8, BLACK);
+            display1.fillRect(6,8,4,8, WHITE);
+            display1.fillRect(12,0,10,16, BLACK);
         }
-        else if (signal > 50 && signal <= 75)
+        else if (Oled::WifiSignal > 50 && Oled::WifiSignal <= 75)
         {
-            display2.fillRect(0,0,4,12, BLACK);
-            display2.fillRect(0,12,4,4, WHITE);
-            display2.fillRect(6,0,4,8, BLACK);
-            display2.fillRect(6,8,4,8, WHITE);
-            display2.fillRect(12,0,4,4, BLACK);
-            display2.fillRect(12,4,4,12, WHITE);
-            display2.fillRect(18,0,4,16, BLACK);
+            display1.fillRect(0,0,4,12, BLACK);
+            display1.fillRect(0,12,4,4, WHITE);
+            display1.fillRect(6,0,4,8, BLACK);
+            display1.fillRect(6,8,4,8, WHITE);
+            display1.fillRect(12,0,4,4, BLACK);
+            display1.fillRect(12,4,4,12, WHITE);
+            display1.fillRect(18,0,4,16, BLACK);
         }
-        else if (signal > 75)
+        else if (Oled::WifiSignal > 75)
         {
-            display2.fillRect(0,0,4,12, BLACK);
-            display2.fillRect(0,12,4,4, WHITE);
-            display2.fillRect(6,0,4,8, BLACK);
-            display2.fillRect(6,8,4,8, WHITE);
-            display2.fillRect(12,0,4,4, BLACK);
-            display2.fillRect(12,4,4,12, WHITE);
-            display2.fillRect(18,0,4,16, WHITE);
+            display1.fillRect(0,0,4,12, BLACK);
+            display1.fillRect(0,12,4,4, WHITE);
+            display1.fillRect(6,0,4,8, BLACK);
+            display1.fillRect(6,8,4,8, WHITE);
+            display1.fillRect(12,0,4,4, BLACK);
+            display1.fillRect(12,4,4,12, WHITE);
+            display1.fillRect(18,0,4,16, WHITE);
         }
-        Oled::updaterequestdisplay2 = true;
+        Oled::updaterequestdisplay1 = true;
     }
-    Oled::LastWifisignal = signal;
+    Oled::LastWifisignal = Oled::WifiSignal;
 
 }
 
 //Battery Health --> diplay2
-void Oled::SetBatteryHealthDisplay(int batteryvoltage){
-    if(batteryvoltage < OLED_BATTERY_LENGTH && batteryvoltage != Oled::LastBatteryVoltage){
-        display2.fillRect((92 + batteryvoltage), 6, (OLED_BATTERY_LENGTH - batteryvoltage), 6, BLACK);
-        display2.fillRect(92, 6, batteryvoltage, 6, WHITE);
-        Oled::LastBatteryVoltage = batteryvoltage;
-        updaterequestdisplay2 = true;
+void Oled::ProcessBatteryHealthDisplay(){
+    if(Oled::BatteryVoltage < OLED_BATTERY_LENGTH && Oled::BatteryVoltage != Oled::LastBatteryVoltage){
+        display2.fillRect((92 + Oled::BatteryVoltage), 6, (OLED_BATTERY_LENGTH - Oled::BatteryVoltage), 6, BLACK);
+        display2.fillRect(92, 6, Oled::BatteryVoltage, 6, WHITE);
+        Oled::LastBatteryVoltage = Oled::BatteryVoltage;
+        Oled::updaterequestdisplay2 = true;
     }
 }
 
 //SPO2 --> display2
-void Oled::SetSPO2Display(int SPO2value){
-    if(Oled::LastSPO2 != SPO2value ){
+void Oled::ProcessSetSPO2Display(){
+    if(Oled::LastSPO2 != Oled::SPO2 ){
         display2.fillRect(6, 32, 56, 32, BLACK);
         display2.setTextSize(3); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(6, 32);
-        display2.println(SPO2value);
-        LastSPO2 = SPO2value;
-        updaterequestdisplay2 = true;
+        display2.println(Oled::SPO2);
+        Oled::LastSPO2 = Oled::SPO2;
+        Oled::updaterequestdisplay2 = true;
     }
 }
 
 //BPM --> display2
-void Oled::SetBPMDisplay(int HeartRate){
-    if(LastHeartRate != HeartRate){
+void Oled::ProcessSetBPMDisplay(){
+    if(Oled::LastHeartRate != Oled::HeartRate){
         display2.fillRect(70, 32, 56, 32, BLACK);
         display2.setTextSize(3); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(70, 32);
-        display2.println(HeartRate);;
-        LastHeartRate = HeartRate;
-        updaterequestdisplay2 = true;
+        display2.println(Oled::HeartRate);;
+        Oled::LastHeartRate = Oled::HeartRate;
+        Oled::updaterequestdisplay2 = true;
     }
 }
 
 //BP -- >Display1
-void Oled::SetBPressureDisplay(int SystolicP, int DiastolicP){
-    if(LastPressureSystolic != SystolicP || LastPressureDiastolic != DiastolicP)
+void Oled::ProcessSetBPressureDisplay(){
+    if(Oled::LastPressureSystolic != Oled::PressureSystolic || Oled::LastPressureDiastolic != Oled::PressureDiastolic)
     {
         display1.fillRect(30, 32, 32, 16, BLACK);
         display1.fillRect(80, 32, 32, 16, BLACK);
         display1.setTextSize(2); // Draw 2X-scale text
         display1.setTextColor(SSD1306_WHITE);
         display1.setCursor(30, 32);
-        display1.println(SystolicP);
+        display1.println(Oled::PressureSystolic);
         display1.setCursor(80, 32);
-        display1.println(DiastolicP);
-        LastPressureSystolic = SystolicP;
-        LastPressureDiastolic = DiastolicP;
-        updaterequestdisplay1 = true;
+        display1.println(Oled::PressureDiastolic);
+        LastPressureSystolic = Oled::PressureSystolic;
+        LastPressureDiastolic = Oled::PressureDiastolic;
+        Oled::updaterequestdisplay1 = true;
     }
 }
 
 //ShowHeart
-void Oled::SetBPMBitMap(){
+void Oled::ProcessSetBPMBitMap(){
     display2.drawBitmap(0, 0, heart, 16, 16, 1);
 }
 
 //update display1
-void Oled::UpdateDisplay1(){
+void Oled::updatedisplay1(){
     if(updaterequestdisplay1 == true && (millis()-Oled1TimeStamp) >= OLED_UPDATE_TIME_INT){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating Display...");
         #endif
         display1.display();
-        //display2.display();
         updaterequestdisplay1 = false;
         Oled1TimeStamp = millis();
     }
 }
 
-void Oled::UpdateDisplay1(int* TimeStamp){
+void Oled::updatedisplay1(int* TimeStamp){
     if(updaterequestdisplay1 == true && (millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating Display...");
@@ -287,7 +277,7 @@ void Oled::UpdateDisplay1(int* TimeStamp){
 }
 
 //Update display2
-void Oled::UpdateDisplay2(){
+void Oled::updatedisplay2(){
     if(updaterequestdisplay2 == true && (millis()-Oled2TimeStamp) >= OLED_UPDATE_TIME_INT){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating Display...");
@@ -298,7 +288,7 @@ void Oled::UpdateDisplay2(){
     }
 }
 
-void Oled::UpdateDisplay2(int* TimeStamp){
+void Oled::updatedisplay2(int* TimeStamp){
     if(updaterequestdisplay2 == true && (millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating Display...");
@@ -310,3 +300,47 @@ void Oled::UpdateDisplay2(int* TimeStamp){
 }
 
 
+/************************************Getters and Setters***********************************************/
+//get ERRORS
+bool Oled::GetDisplay1ERROR(){
+    return Oled::Display1ConnectionError;
+}
+
+bool Oled::GetDisplay2ERROR(){
+    return Oled::Display2ConnectionError;
+}
+
+//Setters
+void Oled::SetSPO2(int* value){
+    Oled::SPO2 = *value;
+}
+
+void Oled::SetBPM(int* value){
+    Oled::HeartRate = *value;
+}
+
+void Oled::SetBPressure(int* sys, int* dias){
+    Oled::PressureSystolic = *sys;
+    Oled::PressureDiastolic = *dias;
+}
+
+void Oled::SetBatteryVoltage(int* value){
+    Oled::BatteryVoltage = *value;
+}
+
+void Oled::SetWifiSignal(int* value){
+    Oled::WifiSignal = *value;
+}
+
+void Oled::UpdatePatientDataDisplay1(){
+    
+}
+void Oled::UpdatePatientDataDisplay2(){
+    
+}
+void Oled::UpdateSystemDataDisplay1(){
+    
+}
+void Oled::UpdateSystemDataDisplay2(){
+    
+}
