@@ -1,0 +1,54 @@
+{
+    "description": "A library that provides a wifi and MQTT connection to an ESP8266/ESP32", 
+    "repository": {
+        "url": "https://github.com/plapointe6/EspMQTTClient", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr", 
+        "atmelmegaavr", 
+        "atmelsam", 
+        "espressif32", 
+        "espressif8266", 
+        "gd32v", 
+        "infineonxmc", 
+        "intel_arc32", 
+        "kendryte210", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "nordicnrf52", 
+        "ststm32", 
+        "ststm8", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "export": {
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ], 
+        "include": null
+    }, 
+    "authors": [
+        {
+            "maintainer": true, 
+            "name": "Patrick Lapointe", 
+            "url": null, 
+            "email": "patrick.lapointe@hotmail.ca"
+        }
+    ], 
+    "keywords": [
+        "communication"
+    ], 
+    "id": 5956, 
+    "name": "EspMQTTClient", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "1.8.0", 
+    "homepage": null
+}
