@@ -4,8 +4,6 @@
 
 //define all pins
 //I2c general
-#define _SCL 39
-#define _SDA 42
 
 //Max30100
 #define _INT_PULSE_METER 34

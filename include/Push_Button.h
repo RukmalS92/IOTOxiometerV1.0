@@ -18,9 +18,7 @@ class PushButton{
         ~PushButton();
         void ButtonInit();
         void UpdateButton(); 
-        void ButtonReadMainButton();
-        void ButtonReadCTRL1Button();
-        void ButtonReadCTRL2Button();
+        
 
         //Getters
         bool GetMainButtonPressedstate();
@@ -63,6 +61,10 @@ class PushButton{
         bool mainbuttonvalidpress;
         bool ctrl1buttonvalidpress;
         bool ctrl2buttonvalidpress;
+
+        void ButtonReadMainButton();
+        void ButtonReadCTRL1Button();
+        void ButtonReadCTRL2Button();
 
         void ButtonPress(bool* pressedflag, bool* longpressedflag, bool* validpress,
                              bool* firstcheckflag , bool* laststate, int* button, long* lastdebouncetime 

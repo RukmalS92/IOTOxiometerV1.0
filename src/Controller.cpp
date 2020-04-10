@@ -20,7 +20,7 @@
 //Oled Constructor --INNER--
 Adafruit_SSD1306 disp1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_SSD1306 disp2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-Oled Display(disp1, disp2);
+Oled Display(disp1, disp2); 
 
 Controller::Controller(){
     ShowBPFlag = false;

@@ -33,48 +33,66 @@ void MqttControl::GetWifiStrength(){
     MqttControl::WifiStrength = x;
 }
 
-void MqttControl::MqttConnect(){
-    if(!client.connected())
-    {
-        client.connect(clientName);
-    }
-    while (!client.connected())
-    {
-        client.connect(clientName);
-        Serial.print("Waiting MQTT Server...");
-        delay(100);
-    }
-    
-    if(client.connected()){
-        Serial.println("Connected MQTT Server...");
-    }
-}
 
 void MqttControl::MqttInit(){
     //wifi
-    if(WiFi.status()!=WL_CONNECTED){
-        WiFi.begin(wifiSSID, wifiPASS);
+    for(int i = 0; i < TRYOUTS; i++){
+        if(WiFi.status()!=WL_CONNECTED){
+            WiFi.begin(wifiSSID, wifiPASS);
+            connectiontimeouttime = millis();
+        }
+        while (WiFi.status()!=WL_CONNECTED)
+        {
+            Serial.print(".") ;
+            if((millis() - connectiontimeouttime) > TIMEOUT_WIFI){
+                Serial.println("Could Not Connect to Host");
+                break;
+            }
+        }
+        if(WiFi.status() == WL_CONNECTED){
+            Serial.println("Connected");
+            Serial.print("locl IP ::");
+            Serial.println(WiFi.localIP());
+            break;
+        }
     }
-    while (WiFi.status()!=WL_CONNECTED)
-    {
-        Serial.print(".") ;
-    }
-    if(WiFi.status() == WL_CONNECTED){
-        Serial.println("Connected");
-        Serial.print("locl IP ::");
-        Serial.println(WiFi.localIP());
-    }
-
     //Mqtt
     client.setServer(mqtt_server, _Port);
     MqttControl::MqttConnect();
 
-
 }
+
+void MqttControl::MqttConnect(){
+    for(int i = 0; i < TRYOUTS; i++){
+        if(!client.connected())
+        {
+            client.connect(clientName);
+            connectiontimeouttime = millis();
+            Serial.println("Waiting MQTT Server...");
+        }
+        while (!client.connected())
+        {
+            Serial.print(".");
+            if((millis() - connectiontimeouttime) > TIMEOUT_WIFI){
+                Serial.println("Could Not Connect to Server");
+                break;
+            }
+        }
+        if(client.connected()){
+            Serial.println("Connected MQTT Server...");
+            break;
+        }
+    }
+}
+
 
 void MqttControl::MqttPublish(const char* Topic,const char* wrstring ){
     client.publish(Topic, wrstring);
     client.loop();
+}
+
+void MqttControl::Reconnect(){
+
 }
 
 
