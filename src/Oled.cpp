@@ -46,10 +46,11 @@ Oled::~Oled(){
 
 //init display
 void Oled::DisplayInit(){
-    Oled1TimeStamp=0;
-    Oled2TimeStamp=0;
+    oledtimestamp=0;
     updaterequestdisplay1=false;
     updaterequestdisplay2=false;
+    display1updatecomplete=false;
+    display2updatecomplete=false;
 
     LastSPO2=0;
     LastHeartRate=0;
@@ -65,25 +66,51 @@ void Oled::DisplayInit(){
     BatteryVoltage=0;
     WifiSignal=0;
 
-    Display1ConnectionError=false;
-    Display2ConnectionError=false;
+    connectiontimeout=0;
+
+    display1connection=false;
+    display2connection=false;
 
     #ifdef USE_SERIAL_MONITOR
         Serial.println("System Initializing...");
     #endif
-    
-    while((Display2ConnectionError = display2.begin(SSD1306_SWITCHCAPVCC, 0x3C)) != true ){
+    Oled::connectiontimeout = millis();
+    while(((display2connection = display2.begin(SSD1306_SWITCHCAPVCC, 0x3C)) != true)){
         #ifdef USE_SERIAL_MONITOR
             Serial.print("Connection display-2... "); Serial.println("0x3C"); 
         #endif
+        if(((millis() - Oled::connectiontimeout) > _CON_TIMEOUT)) {break;}
     }
-    while((Display1ConnectionError = display1.begin(SSD1306_SWITCHCAPVCC, 0x3D)) != true){
+    Oled::connectiontimeout = millis();
+    while((display1connection = display1.begin(SSD1306_SWITCHCAPVCC, 0x3D)) != true){
         #ifdef USE_SERIAL_MONITOR
             Serial.print("Connection display-1... "); Serial.println("0x3D"); 
         #endif
+        if(((millis() - Oled::connectiontimeout) > _CON_TIMEOUT)) {break;}
     }
-    Oled::Display2MonitorSceneSetup();
-    Oled::Display1MonitorSceneSetup();
+
+    if(display2connection == true){
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Display 2 Initialized..");
+        #endif
+        Oled::Display2MonitorSceneSetup();
+    }
+    else
+    {
+        Serial.println("Display 2 Damaged");
+    }
+
+    if(display1connection == true){
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Display 1 Initialized..");
+        #endif
+        Oled::Display1MonitorSceneSetup();
+    }
+    else
+    {
+        Serial.println("Display 1 Damaged");
+    }
+    
     #ifdef USE_SERIAL_MONITOR
         Serial.println("System Initializing Comeplete!!!");
     #endif
@@ -148,12 +175,12 @@ void Oled::Display1MonitorSceneSetup(){
     display1.setTextSize(2); 
     //sys
     display1.setCursor(30, 32);
-    display1.println("999");
+    display1.println("---");
     display1.drawLine(75,32,65,48,WHITE);
 
     //dias
     display1.setCursor(80, 32);
-    display1.println("000");
+    display1.println("---");
 
     
     display1.display();
@@ -262,20 +289,20 @@ void Oled::ProcessSetBPMBitMap(){
 
 //update display1
 void Oled::updatedisplay1(){
-    if(updaterequestdisplay1 == true && (millis()-Oled1TimeStamp) >= OLED_UPDATE_TIME_INT){
+    if((updaterequestdisplay1 == true) && ((millis()-oledtimestamp) >= OLED_UPDATE_TIME_INT) && (display1connection == true)){
         #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating Display...");
+            Serial.println("Updating Display 1...");
         #endif
         display1.display();
         updaterequestdisplay1 = false;
-        Oled1TimeStamp = millis();
+        oledtimestamp = millis();
     }
 }
 
 void Oled::updatedisplay1(int* TimeStamp){
-    if(updaterequestdisplay1 == true && (millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT){
+    if((updaterequestdisplay1 == true) && ((millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT) && (display1connection == true) ){
         #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating Display...");
+            Serial.println("Updating Display 1...");
         #endif
         display1.display();
         updaterequestdisplay1 = false;
@@ -285,20 +312,20 @@ void Oled::updatedisplay1(int* TimeStamp){
 
 //Update display2
 void Oled::updatedisplay2(){
-    if(updaterequestdisplay2 == true && (millis()-Oled2TimeStamp) >= OLED_UPDATE_TIME_INT){
+    if((updaterequestdisplay2 == true) && ((millis()-oledtimestamp) >= OLED_UPDATE_TIME_INT) && (display2connection == true)){
         #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating Display...");
+            Serial.println("Updating Display 2...");
         #endif
         display2.display();
         updaterequestdisplay2 = false;
-        Oled2TimeStamp = millis();
+        oledtimestamp = millis();
     }
 }
 
 void Oled::updatedisplay2(int* TimeStamp){
-    if(updaterequestdisplay2 == true && (millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT){
+    if((updaterequestdisplay2 == true) && ((millis() - *TimeStamp) >= OLED_UPDATE_TIME_INT)  && (display2connection == true)){
         #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating Display...");
+            Serial.println("Updating Display 2...");
         #endif
         display2.display();
         updaterequestdisplay2 = false;
@@ -310,11 +337,11 @@ void Oled::updatedisplay2(int* TimeStamp){
 /************************************Getters and Setters***********************************************/
 //get ERRORS
 bool Oled::GetDisplay1ERROR(){
-    return Oled::Display1ConnectionError;
+    return Oled::display1connection;
 }
 
 bool Oled::GetDisplay2ERROR(){
-    return Oled::Display2ConnectionError;
+    return Oled::display2connection;
 }
 
 //Setters
@@ -339,20 +366,11 @@ void Oled::SetWifiSignal(int* value){
     Oled::WifiSignal = *value;
 }
 
-void Oled::UpdatePatientDataDisplay1(){
-    Oled::ProcessSetBPressureDisplay();
-    Oled::updatedisplay1();
+bool Oled::GetDisplay1UpdateBusy(){
+    return Oled::updaterequestdisplay1;
 }
-void Oled::UpdatePatientDataDisplay2(){
-    Oled::ProcessSetSPO2Display();
-    Oled::ProcessSetBPMDisplay();
-    Oled::updatedisplay2();
+
+bool Oled::GetDisplay2UpdateBusy(){
+    return Oled::updaterequestdisplay2;
 }
-void Oled::UpdateSystemDataDisplay1(){
-    Oled::ProcessWifiSignalDisplay();
-    Oled::updatedisplay1();
-}
-void Oled::UpdateSystemDataDisplay2(){
-    Oled::ProcessBatteryHealthDisplay();
-    Oled::updatedisplay2();
-}
+

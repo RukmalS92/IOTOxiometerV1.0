@@ -18,20 +18,8 @@
 
 using namespace std;
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
-
 StaticJsonDocument<200> doc;
 char jsonbuffer[512];
-
-//Oled Constructor --INNER--
-//Adafruit_SSD1306 disp1(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-//Adafruit_SSD1306 disp2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-//Oled Display(disp1, disp2);
-
 
 IPAddress localIP(192,168,1,22);
 IPAddress serverIP(34,71,47,61);
@@ -45,11 +33,13 @@ const char* user = "mica";
 const char* pass = "mica@autonomation";
 
 MqttControl mqttclient(serverIP, wifissid, wifipass, cl, 1991, user, pass);
-int MainTimeStamp = 0;
-
 PushButton button;
 BatteryHealth battery;
 Controller controller;
+
+int MainTimeStamp = 0;
+
+
 
 long timebuf = 0;
 long timebuf2 = 0;
@@ -79,6 +69,8 @@ void loop() {
   
   button.UpdateButton();
   battery.UpdateBatteryMonitoring();
-  controller.UpdateUserRequestFlags();
+  controller.ReadNonDeviceVars(battery.GetBatteryHealth(), 35);
+  controller.UpdateCyclicPatientData();
+  controller.UpdateCyclicSystemData();
   
 }

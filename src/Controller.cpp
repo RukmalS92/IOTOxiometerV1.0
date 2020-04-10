@@ -43,9 +43,9 @@ void Controller::AllDevicesInit(){
     /*Here Goes BP Init*/
 }
 
-void Controller::ReadNonDeviceVars(int* batteryHealth, int* wifistrength){
-    BatteryHealth = *batteryHealth;
-    wifisignal = *wifistrength;
+void Controller::ReadNonDeviceVars(int batteryHealth, int wifistrength){
+    BatteryHealth = batteryHealth;
+    wifisignal = wifistrength;
 }
 
 //writing Display data on display1
@@ -79,10 +79,29 @@ void Controller::WriteDisplay2(){
 //Update event for every 15min
 void Controller::UpdateCyclicPatientData(){
     if((millis() - Controller::CyclicPatientDataUpdateTimeStamp) > MAIN_CYCLE_UPDATE_TIME){
-        Controller::WriteDisplay1();
-        Controller::WriteDisplay2();
-        //isplay.UpdateDisplay2();
-        Controller::CyclicPatientDataUpdateTimeStamp = millis();
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Updating Patient Data");
+        #endif
+        Display.SetSPO2(&BatteryHealth);
+        Display.SetBPM(&BatteryHealth);
+        Display.SetBPressure(&BatteryHealth, &BatteryHealth);
+        Display.ProcessSetSPO2Display();
+        Display.ProcessSetBPMDisplay();
+        Display.ProcessSetBPressureDisplay();
+        Display.updatedisplay1();
+        Display.updatedisplay2();
+        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+            Controller::CyclicPatientDataUpdateTimeStamp = millis();
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating Patient Data Comeplete");
+            #endif
+        }
+        else{
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating Patient Data.....");
+            #endif
+        }
+        
     }
         
 }
@@ -90,8 +109,26 @@ void Controller::UpdateCyclicPatientData(){
 //update every minute
 void Controller::UpdateCyclicSystemData(){
     if((millis() - Controller::CyclicSystemDataUpdateTimeStamp) > SYSTEM_UPDATE_TIME){
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Updating System Data");
+        #endif
+        Display.SetBatteryVoltage(&BatteryHealth);
+        Display.SetWifiSignal(&BatteryHealth);
+        Display.ProcessBatteryHealthDisplay();
+        Display.ProcessWifiSignalDisplay();
+        Display.updatedisplay1();
+        Display.updatedisplay2();
+        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+            Controller::CyclicSystemDataUpdateTimeStamp = millis();
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating System Data Comeplete");
+            #endif
+        }else{
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating System Data.....");
+            #endif
+        }
         
-        Controller::CyclicSystemDataUpdateTimeStamp = millis();
     }
     
 }

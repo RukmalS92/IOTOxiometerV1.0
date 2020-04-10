@@ -56,16 +56,16 @@
 //#define USE_PB_AS_INTERRUPT
 
 /*----inOLED battery length---*/
-#define OLED_BATTERY_LENGTH 30
+#define OLED_BATTERY_LENGTH 25
 
 /*-------------------Update Time Interval-----------------------*/
 #define OLED_UPDATE_TIME_INT 10
 
 /*-------------------------------------Update Time Cycle---------------------------------------*/
-#define MAIN_CYCLE_UPDATE_TIME 2500
+#define MAIN_CYCLE_UPDATE_TIME 10000
 
 /*-------------------------------------Update System Time Cycle---------------------------------------*/
-#define SYSTEM_UPDATE_TIME 1000
+#define SYSTEM_UPDATE_TIME 5000
 
 /*-------------------------------------I2C Update Delay---------------------------------------*/
 #define _I2CBUS_WR_DELAY 0

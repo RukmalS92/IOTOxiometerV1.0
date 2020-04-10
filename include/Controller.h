@@ -1,14 +1,6 @@
 #ifndef _CONTROLLER_H
 #define _CONTROLLER_H
 
-/*
-    Left Display ===> WIFI, BP
-
-    Right Display ==> BatteryHealth, SpO2, BPM
-
-*/
-
-
 #include <Arduino.h>
 class Controller{
     public:
@@ -25,7 +17,7 @@ class Controller{
 
         //inner methods
         void AllDevicesInit();
-        void ReadNonDeviceVars(int* batteryHealth, int* wifistrength);
+        void ReadNonDeviceVars(int batteryHealth, int wifistrength);
         void ReadSpo2();
         void ReadBPM();
         void ReadBloodPressure();

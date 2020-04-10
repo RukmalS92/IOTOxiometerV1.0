@@ -23,7 +23,7 @@ PushButton::~PushButton(){
 
 void PushButton::ButtonInit(){
     #ifdef USE_PB_AS_INTERRUPT
-        Serial.println("Using Interrupts @ pushbutton pins")
+        Serial.println("Using Interrupts @ pushbutton pins");
     #endif
 
     #ifndef USE_PB_AS_INTERRUPT
@@ -97,7 +97,6 @@ void PushButton::ButtonPress(bool* pressedflag, bool* longpressedflag, bool* val
     else if(((millis() - *lastdebouncetime) > _DEBOUNCE_TIME) && (reading != false) && (*firstcheckflag == true) && (*validpress != true)){
         *firstcheckflag = false;
     }
-
     //getting lng press or short press
     if(((millis() - *lastdebouncetime) > _LONGPRESS_TIME) && (*validpress == true) && (reading == false)){
         *longpressedflag = true;

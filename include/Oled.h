@@ -4,6 +4,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+//connection timeoutcheck
+#define _CON_TIMEOUT 3000
 
 /*
     Display1 ----> BP, Wifi
@@ -33,12 +35,21 @@ class Oled{
         void SetBatteryVoltage(int* batvalue);
         void SetWifiSignal(int* wifisignal);
 
-    
         //Updaters
-        void UpdatePatientDataDisplay1(); //updates BP
-        void UpdatePatientDataDisplay2(); //updates spo2, BPM
-        void UpdateSystemDataDisplay1(); //updates wifi
-        void UpdateSystemDataDisplay2(); //updates battery
+        void ProcessWifiSignalDisplay();
+        void ProcessBatteryHealthDisplay();
+        void ProcessSetSPO2Display();
+        void ProcessSetBPMDisplay();
+        void ProcessSetBPMBitMap();
+        void ProcessSetBPressureDisplay();
+
+        void updatedisplay1();
+        void updatedisplay1(int *TimeStamp);
+        void updatedisplay2();
+        void updatedisplay2(int *TimeStamp);
+
+        bool GetDisplay1UpdateBusy();
+        bool GetDisplay2UpdateBusy();
         /*******************************************************/
         //Getters
         bool GetDisplay1ERROR();
@@ -47,11 +58,15 @@ class Oled{
     private:
         Adafruit_SSD1306 display1;
         Adafruit_SSD1306 display2;
-        long Oled1TimeStamp;
-        long Oled2TimeStamp;
+        long oledtimestamp;
+
+        long connectiontimeout;
 
         bool updaterequestdisplay1;
         bool updaterequestdisplay2;
+
+        bool display1updatecomplete;
+        bool display2updatecomplete;
 
         //Internal VAraiables
         int SPO2;
@@ -69,24 +84,13 @@ class Oled{
         int LastWifisignal;
 
         //Error Handling for Display Communication initlization
-        bool Display1ConnectionError;
-        bool Display2ConnectionError;
+        bool display1connection;
+        bool display2connection;
 
         void Display1StartupPage();
         void Display2StartupPage();
 
-        void ProcessWifiSignalDisplay();
-        void ProcessBatteryHealthDisplay();
-        void ProcessSetSPO2Display();
-        void ProcessSetBPMDisplay();
-        void ProcessSetBPMBitMap();
-        void ProcessSetBPressureDisplay();
-
-        void updatedisplay1();
-        void updatedisplay1(int *TimeStamp);
-        void updatedisplay2();
-        void updatedisplay2(int *TimeStamp);
-
+    
     protected:
 };
 
