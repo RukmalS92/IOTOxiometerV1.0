@@ -4,6 +4,12 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+
+/*
+    Display1 ----> BP, Wifi
+    Display2 ----> SPO2, BPM, BatteryHealth
+*/
+
 class Oled{
     public:
         //Vars
@@ -19,7 +25,7 @@ class Oled{
         //Setup the Monitoing Display Scenne for updating sensors data.
         void Display1MonitorSceneSetup();
         void Display2MonitorSceneSetup();
-
+        /******************************************************/
         //Setters
         void SetSPO2(int* value);
         void SetBPM(int* value);
@@ -27,18 +33,17 @@ class Oled{
         void SetBatteryVoltage(int* batvalue);
         void SetWifiSignal(int* wifisignal);
 
+    
+        //Updaters
+        void UpdatePatientDataDisplay1(); //updates BP
+        void UpdatePatientDataDisplay2(); //updates spo2, BPM
+        void UpdateSystemDataDisplay1(); //updates wifi
+        void UpdateSystemDataDisplay2(); //updates battery
+        /*******************************************************/
         //Getters
         bool GetDisplay1ERROR();
         bool GetDisplay2ERROR();
-
-        //Updaters
-        void UpdatePatientDataDisplay1();
-        void UpdatePatientDataDisplay2();
-        void UpdateSystemDataDisplay1();
-        void UpdateSystemDataDisplay2();
-
         
-   
     private:
         Adafruit_SSD1306 display1;
         Adafruit_SSD1306 display2;

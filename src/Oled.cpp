@@ -58,6 +58,13 @@ void Oled::DisplayInit(){
     LastBatteryVoltage=0;
     LastWifisignal=0;
 
+    SPO2=0;
+    HeartRate=0;
+    PressureSystolic=0;
+    PressureDiastolic=0;
+    BatteryVoltage=0;
+    WifiSignal=0;
+
     Display1ConnectionError=false;
     Display2ConnectionError=false;
 
@@ -333,14 +340,19 @@ void Oled::SetWifiSignal(int* value){
 }
 
 void Oled::UpdatePatientDataDisplay1(){
-    
+    Oled::ProcessSetBPressureDisplay();
+    Oled::updatedisplay1();
 }
 void Oled::UpdatePatientDataDisplay2(){
-    
+    Oled::ProcessSetSPO2Display();
+    Oled::ProcessSetBPMDisplay();
+    Oled::updatedisplay2();
 }
 void Oled::UpdateSystemDataDisplay1(){
-    
+    Oled::ProcessWifiSignalDisplay();
+    Oled::updatedisplay1();
 }
 void Oled::UpdateSystemDataDisplay2(){
-    
+    Oled::ProcessBatteryHealthDisplay();
+    Oled::updatedisplay2();
 }
