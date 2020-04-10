@@ -28,10 +28,10 @@ class Controller{
         void UpdateCyclicPatientData();
         void UpdateCyclicSystemData();
         void UpdateUserRequestFlags();
-
+        void DisplayUpdate();
         
-        void WriteDisplay1();
-        void WriteDisplay2();
+        void Update();
+
 
     private:
         long I2CBusWriteTimeStamp;

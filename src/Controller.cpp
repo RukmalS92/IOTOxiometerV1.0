@@ -48,33 +48,6 @@ void Controller::ReadNonDeviceVars(int batteryHealth, int wifistrength){
     wifisignal = wifistrength;
 }
 
-//writing Display data on display1
-void Controller::WriteDisplay1(){
-    if((millis() - Controller::I2CBusWriteTimeStamp) > _I2CBUS_WR_DELAY){
-        /*get BP data*/
-        Controller::I2CBusWriteTimeStamp = millis();
-    }
-    if((millis() - Controller::I2CBusWriteTimeStamp) > _I2CBUS_WR_DELAY){
-        /*Update BP*/
-        Controller::I2CBusWriteTimeStamp = millis();
-    }  
-}
-
-//writing Display data on display2
-void Controller::WriteDisplay2(){
-    if((millis() - Controller::I2CBusWriteTimeStamp) >= _I2CBUS_WR_DELAY){
-        /*get spo2 data*/
-        
-        Controller::I2CBusWriteTimeStamp = millis();
-        
-    } 
-    if((millis() - Controller::I2CBusWriteTimeStamp) >= _I2CBUS_WR_DELAY){
-        /*get BPM data*/
-       
-        Controller::I2CBusWriteTimeStamp = millis();
-        
-    } 
-}
 
 //Update event for every 15min
 void Controller::UpdateCyclicPatientData(){
@@ -88,8 +61,6 @@ void Controller::UpdateCyclicPatientData(){
         Display.ProcessSetSPO2Display();
         Display.ProcessSetBPMDisplay();
         Display.ProcessSetBPressureDisplay();
-        Display.updatedisplay1();
-        Display.updatedisplay2();
         if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
             Controller::CyclicPatientDataUpdateTimeStamp = millis();
             #ifdef USE_SERIAL_MONITOR
@@ -116,8 +87,6 @@ void Controller::UpdateCyclicSystemData(){
         Display.SetWifiSignal(&BatteryHealth);
         Display.ProcessBatteryHealthDisplay();
         Display.ProcessWifiSignalDisplay();
-        Display.updatedisplay1();
-        Display.updatedisplay2();
         if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
             Controller::CyclicSystemDataUpdateTimeStamp = millis();
             #ifdef USE_SERIAL_MONITOR
@@ -133,16 +102,19 @@ void Controller::UpdateCyclicSystemData(){
     
 }
 
+void Controller::DisplayUpdate(){
+    Display.updatedisplay1();
+    Display.updatedisplay2();
+}
+
 //update @ request
 //BP
 void Controller::UpdateDisplay1atRequest(){
-    Controller::WriteDisplay1();
-    //Display.UpdateDisplay2();
+   
 }
 //BPM and SpO2
 void Controller::UpdateDisplay2atRequest(){
-    Controller::WriteDisplay2();
-    //Display.UpdateDisplay2();
+   
 }
 
 /*-------------------UPDATE @ ButtonPress----------------------*/
@@ -162,3 +134,7 @@ void Controller::UpdateUserRequestFlags(){
     }
 }
 
+/*--------------------------Main Update---------------------------*/
+void Controller::Update(){
+
+}
