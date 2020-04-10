@@ -5,7 +5,7 @@
 #include <main.h>
 #include <Oled.h>
 #include <Mqtt_Control.h>
-#include<BatteryHealth.h>
+#include <BatteryHealth.h>
 
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
@@ -28,9 +28,9 @@ IPAddress subnet(255,255,255,0);
 
 const char* wifissid = "RUK-WIFI";
 const char* wifipass = "madushan2014Sen";
-const char* cl = "cli";
-const char* user = "mica";
-const char* pass = "mica@autonomation";
+const char* cl = "1";
+const char* user = "admin@123";
+const char* pass = "admin@123";
 
 MqttControl mqttclient(serverIP, wifissid, wifipass, cl, 1991, user, pass);
 PushButton button;
@@ -38,8 +38,6 @@ BatteryHealth battery;
 Controller controller;
 
 int MainTimeStamp = 0;
-
-
 
 long timebuf = 0;
 long timebuf2 = 0;
@@ -50,15 +48,7 @@ void setup() {
   
   mqttclient.SetupLocalIPV4(localIP, gateway, subnet);
   mqttclient.MqttInit();
-  doc["devid"] = "client1";
-  doc["spo2"] = "1.2";
-  doc["bpm"] = "62";
-  doc["sypre"] = "1.2";
-  doc["dipre"] = "1.6";
-  
-  serializeJson(doc, jsonbuffer);
-  Serial.println(jsonbuffer);
-
+  mqttclient.setTpoic("sensors");
   controller.AllDevicesInit();
   button.ButtonInit();
   battery.BatteryHealthInit();
@@ -79,5 +69,6 @@ void loop() {
   battery.UpdateBatteryMonitoring();
   controller.ReadNonDeviceVars(battery.GetBatteryHealth(), 35);
   controller.Update();
+  mqttclient.MqttUpdate();
   
 }
