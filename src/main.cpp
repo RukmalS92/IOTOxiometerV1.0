@@ -70,7 +70,6 @@ void loop() {
   button.UpdateButton();
   battery.UpdateBatteryMonitoring();
   controller.ReadNonDeviceVars(battery.GetBatteryHealth(), 35);
-  controller.UpdateCyclicPatientData();
-  controller.UpdateCyclicSystemData();
+  controller.Update();
   
 }

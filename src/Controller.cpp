@@ -136,5 +136,7 @@ void Controller::UpdateUserRequestFlags(){
 
 /*--------------------------Main Update---------------------------*/
 void Controller::Update(){
-
+    Controller::UpdateCyclicPatientData();
+    Controller::UpdateCyclicSystemData();
+    Controller::DisplayUpdate();
 }
