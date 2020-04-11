@@ -46,6 +46,7 @@ void setup() {
   hmi.AllDevicesInit();
   
   //this the only method to add param
+  //check main.h for enum
   hmi.SetPatientData(SPO2, 42);
   hmi.SetPatientData(BPM, 88);
 }
