@@ -48,10 +48,12 @@ void setup() {
   
   mqttclient.SetupLocalIPV4(localIP, gateway, subnet);
   mqttclient.MqttInit();
-  mqttclient.setTpoic("sensors");
   controller.AllDevicesInit();
   button.ButtonInit();
   battery.BatteryHealthInit();
+  mqttclient.SetData(SPO2, 42);
+  mqttclient.SetData(BPM, 10);
+
 }
 
 void loop() {
@@ -60,10 +62,10 @@ void loop() {
   button.UpdateButton();
 
   if(button.GetMainButtonPressedstate() == true){
-    
+      mqttclient.SetDocCallPublishRequest();
   }
   if(button.GetCtrl2ButtonPressedstate() == true){
-    
+      mqttclient.ClearDocCallPublishRequest();
   }
 
   battery.UpdateBatteryMonitoring();
