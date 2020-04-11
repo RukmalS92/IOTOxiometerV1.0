@@ -59,7 +59,7 @@ void Oled::DisplayInit(){
     LastBatteryVoltage=0;
     LastWifisignal=0;
 
-    SPO2=0;
+    SpO2=0;
     HeartRate=0;
     PressureSystolic=0;
     PressureDiastolic=0;
@@ -240,13 +240,13 @@ void Oled::ProcessBatteryHealthDisplay(){
 
 //SPO2 --> display2
 void Oled::ProcessSetSPO2Display(){
-    if(Oled::LastSPO2 != Oled::SPO2 ){
+    if(Oled::LastSPO2 != Oled::SpO2 ){
         display2.fillRect(6, 32, 56, 32, BLACK);
         display2.setTextSize(3); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(6, 32);
-        display2.println(Oled::SPO2);
-        Oled::LastSPO2 = Oled::SPO2;
+        display2.println(Oled::SpO2);
+        Oled::LastSPO2 = Oled::SpO2;
         Oled::updaterequestdisplay2 = true;
     }
 }
@@ -344,28 +344,6 @@ bool Oled::GetDisplay2ERROR(){
     return Oled::display2connection;
 }
 
-//Setters
-void Oled::SetSPO2(int* value){
-    Oled::SPO2 = *value;
-}
-
-void Oled::SetBPM(int* value){
-    Oled::HeartRate = *value;
-}
-
-void Oled::SetBPressure(int* sys, int* dias){
-    Oled::PressureSystolic = *sys;
-    Oled::PressureDiastolic = *dias;
-}
-
-void Oled::SetBatteryVoltage(int* value){
-    Oled::BatteryVoltage = *value;
-}
-
-void Oled::SetWifiSignal(int* value){
-    Oled::WifiSignal = *value;
-}
-
 bool Oled::GetDisplay1UpdateBusy(){
     return Oled::updaterequestdisplay1;
 }
@@ -373,4 +351,27 @@ bool Oled::GetDisplay1UpdateBusy(){
 bool Oled::GetDisplay2UpdateBusy(){
     return Oled::updaterequestdisplay2;
 }
+//Setters
+void Oled::SetPatientParameters(int parameter, int value){
+    switch (parameter)
+    {
+    case SPO2: 
+        Oled::SpO2 = value;
+        break;
+    case BPM : 
+        Oled::HeartRate = value;
+        break;
+    case BPsys : 
+        Oled::PressureSystolic = value;
+        break;
+    case BPdias : 
+        Oled::PressureDiastolic = value;
+        break;
+    default:
+        break;
+    }
+}
+
+
+
 

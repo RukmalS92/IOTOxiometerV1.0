@@ -40,7 +40,7 @@ class MqttControl{
         bool publishdocrequest;
         bool publishdocrequestclear;
         
-        enumPatientParam patientdata;
+        enumPatientParam patientparameters;
         enumMqttStatus mqttstatu;
 
         const char* wifiSSID;

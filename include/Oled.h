@@ -3,6 +3,7 @@
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <main.h>
 
 //connection timeoutcheck
 #define _CON_TIMEOUT 3000
@@ -29,11 +30,7 @@ class Oled{
         void Display2MonitorSceneSetup();
         /******************************************************/
         //Setters
-        void SetSPO2(int* value);
-        void SetBPM(int* value);
-        void SetBPressure(int* Sys, int* dias);
-        void SetBatteryVoltage(int* batvalue);
-        void SetWifiSignal(int* wifisignal);
+        void SetPatientParameters(int parameter, int value);
 
         //Updaters
         void ProcessWifiSignalDisplay();
@@ -56,6 +53,9 @@ class Oled{
         bool GetDisplay2ERROR();
         
     private:
+
+        enumPatientParam patientparameters;
+
         Adafruit_SSD1306 display1;
         Adafruit_SSD1306 display2;
         long oledtimestamp;
@@ -69,7 +69,7 @@ class Oled{
         bool display2updatecomplete;
 
         //Internal VAraiables
-        int SPO2;
+        int SpO2;
         int HeartRate;
         int PressureSystolic;
         int PressureDiastolic;

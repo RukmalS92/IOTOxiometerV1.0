@@ -55,9 +55,10 @@ void Controller::UpdateCyclicPatientData(){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating Patient Data");
         #endif
-        Display.SetSPO2(&BatteryHealth);
-        Display.SetBPM(&BatteryHealth);
-        Display.SetBPressure(&BatteryHealth, &BatteryHealth);
+        Display.SetPatientParameters(SPO2, BatteryHealth);
+        Display.SetPatientParameters(BPM, BatteryHealth);
+        Display.SetPatientParameters(BPsys, BatteryHealth);
+        Display.SetPatientParameters(BPdias, BatteryHealth);
         Display.ProcessSetSPO2Display();
         Display.ProcessSetBPMDisplay();
         Display.ProcessSetBPressureDisplay();
@@ -83,8 +84,6 @@ void Controller::UpdateCyclicSystemData(){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Updating System Data");
         #endif
-        Display.SetBatteryVoltage(&BatteryHealth);
-        Display.SetWifiSignal(&BatteryHealth);
         Display.ProcessBatteryHealthDisplay();
         Display.ProcessWifiSignalDisplay();
         if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
@@ -137,6 +136,6 @@ void Controller::UpdateUserRequestFlags(){
 /*--------------------------Main Update---------------------------*/
 void Controller::Update(){
     Controller::UpdateCyclicPatientData();
-    Controller::UpdateCyclicSystemData();
+    //Controller::UpdateCyclicSystemData();
     Controller::DisplayUpdate();
 }
