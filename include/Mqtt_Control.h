@@ -11,7 +11,7 @@
 /*Wifi Time out Time*/
 #define TIMEOUT_WIFI 1000
 #define TRYOUTS 3
-#define PUBLISH_DELAY_TIME 3500
+#define PUBLISH_DELAY_TIME 4000
 #define jsonpatientdatabufferchars 128
 #define jsondoccalldatabufferchars 50
 

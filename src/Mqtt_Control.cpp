@@ -51,6 +51,15 @@ void MqttControl::MqttInit(){
     publishdatarequest=false;
     publishdocrequest=false;
     publishdocrequestclear=false;
+
+    spo2=0;
+    bpm=0;
+    bpsystolic=0;
+    bpdiastolic=0;
+
+    connectiontimeouttime=0;
+    publishtime=0;
+    reconnecttime=0;
     //wifi
     for(int i = 0; i < TRYOUTS; i++){
         if(WiFi.status()!=WL_CONNECTED){
@@ -123,7 +132,7 @@ void MqttControl::MqttPublish(){
         MqttControl::doc["sypre"] = String(MqttControl::bpsystolic);
         MqttControl::doc["dipre"] = String(MqttControl::bpdiastolic);
        
-        size_t buffersize = serializeJson(MqttControl::calldoc, MqttControl::jsonbuffer);
+        size_t buffersize = serializeJson(MqttControl::doc, MqttControl::jsonbuffer);
         if(MqttControl::client.connected())
         {
             client.publish(MqttControl::patientTopic, MqttControl::jsonbuffer, buffersize);

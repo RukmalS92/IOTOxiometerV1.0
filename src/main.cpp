@@ -10,16 +10,13 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 
-#include <Controller.h>
+#include <HMI.h>
 
 #include <iostream>
 #include <vector>
 #include <queue>
 
 using namespace std;
-
-StaticJsonDocument<200> doc;
-char jsonbuffer[512];
 
 IPAddress localIP(192,168,1,22);
 IPAddress serverIP(34,71,47,61);
@@ -33,9 +30,7 @@ const char* user = "admin@123";
 const char* pass = "admin@123";
 
 MqttControl mqttclient(serverIP, wifissid, wifipass, cl, 1991, user, pass);
-PushButton button;
-BatteryHealth battery;
-Controller controller;
+HMI hmi(&mqttclient);
 
 int MainTimeStamp = 0;
 
@@ -48,29 +43,22 @@ void setup() {
   
   mqttclient.SetupLocalIPV4(localIP, gateway, subnet);
   mqttclient.MqttInit();
-  controller.AllDevicesInit();
-  button.ButtonInit();
-  battery.BatteryHealthInit();
-  mqttclient.SetData(SPO2, 42);
-  mqttclient.SetData(BPM, 10);
-
+  hmi.AllDevicesInit();
+  
+  //this the only method to add param
+  hmi.SetPatientData(SPO2, 42);
+  hmi.SetPatientData(BPM, 88);
 }
 
 void loop() {
-  
-  
-  button.UpdateButton();
 
-  if(button.GetMainButtonPressedstate() == true){
-      mqttclient.SetDocCallPublishRequest();
-  }
-  if(button.GetCtrl2ButtonPressedstate() == true){
-      mqttclient.ClearDocCallPublishRequest();
+  /*Here dummy request for puhblish request every 6000ms*/
+  if(millis() - timebuf > 6000){
+    mqttclient.SetDataPublishRequest();
+    timebuf = millis();
   }
 
-  battery.UpdateBatteryMonitoring();
-  controller.ReadNonDeviceVars(battery.GetBatteryHealth(), 35);
-  controller.Update();
+  hmi.Update();
   mqttclient.MqttUpdate();
   
 }
