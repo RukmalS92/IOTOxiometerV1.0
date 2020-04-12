@@ -39,11 +39,11 @@ HMI::~HMI(){
 }
 
 void HMI::AllDevicesInit(){
-    Display.DisplayInit();
     pushbutton.ButtonInit();
     batteryhealth.BatteryHealthInit();
     buzzer.BuzzerInit();
     led.LedInit();
+    Display.DisplayInit();
     /*Here Goes SpO2/BPM Init*/
     /*Here Goes BP Init*/
 }
@@ -62,23 +62,20 @@ void HMI::SetPatientData(int parameter, int value){
 //Update event for every 15min
 void HMI::UpdateCyclicPatientData(){
     if((millis() - HMI::CyclicPatientDataUpdateTimeStamp) > MAIN_CYCLE_UPDATE_TIME){
-        #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating Patient Data");
-        #endif
-        //int var = batteryhealth.GetBatteryHealth(); ///TEMP
-        /*
-        Display.SetPatientParameters(SPO2, var);
-        Display.SetPatientParameters(BPM, var);
-        Display.SetPatientParameters(BPsys, var);
-        Display.SetPatientParameters(BPdias, var);*/
-        Display.ProcessSetSPO2Display();
-        Display.ProcessSetBPMDisplay();
-        Display.ProcessSetBPressureDisplay();
         if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
-            HMI::CyclicPatientDataUpdateTimeStamp = millis();
             #ifdef USE_SERIAL_MONITOR
-                Serial.println("Updating Patient Data Comeplete");
+                Serial.println("Updating Patient Data");
             #endif
+            int var = batteryhealth.GetBatteryHealth(); ///TEMP
+            
+            Display.SetPatientParameters(SPO2, var);
+            Display.SetPatientParameters(BPM, var);
+            Display.SetPatientParameters(BPsys, var);
+            Display.SetPatientParameters(BPdias, var);
+            Display.ProcessSetSPO2Display();
+            Display.ProcessSetBPMDisplay();
+            Display.ProcessSetBPressureDisplay();
+            HMI::CyclicPatientDataUpdateTimeStamp = millis();
         }
         else{
             #ifdef USE_SERIAL_MONITOR
@@ -93,17 +90,15 @@ void HMI::UpdateCyclicPatientData(){
 //update every minute
 void HMI::UpdateCyclicSystemData(){
     if((millis() - HMI::CyclicSystemDataUpdateTimeStamp) > SYSTEM_UPDATE_TIME){
-        #ifdef USE_SERIAL_MONITOR
-            Serial.println("Updating System Data");
-        #endif
-        Display.ProcessBatteryHealthDisplay();
-        Display.ProcessWifiSignalDisplay();
         if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
-            HMI::CyclicSystemDataUpdateTimeStamp = millis();
             #ifdef USE_SERIAL_MONITOR
-                Serial.println("Updating System Data Comeplete");
+                Serial.println("Updating System Data");
             #endif
-        }else{
+            Display.ProcessBatteryHealthDisplay();
+            Display.ProcessWifiSignalDisplay();
+            HMI::CyclicSystemDataUpdateTimeStamp = millis(); 
+        }
+        else{
             #ifdef USE_SERIAL_MONITOR
                 Serial.println("Updating System Data.....");
             #endif
@@ -129,13 +124,13 @@ void HMI::CheckButtons(){
         mqttcontrol->ClearDocCallPublishRequest();
         buzzer.ClearDocCallBuzzer();
     }
-    
-    if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
-        
-    }
     //Show bp
     if(pushbutton.GetCtrl1ButtonPressedstate() == true){
-
+        
+    }
+    
+    if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
+        buzzer.SetAssistantCallBuzzer();
     }
     //show spo2/bpm
     if(pushbutton.GetCtrl2ButtonPressedstate() == true){
@@ -143,7 +138,7 @@ void HMI::CheckButtons(){
     }
     //Main Reset
     if(pushbutton.GetCtrl2ButtonLongPressedstate() == true){
-        this->HardReset();
+        buzzer.ClearAssistantCallBuzzer();
     }
 
 

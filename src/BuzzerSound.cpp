@@ -79,10 +79,10 @@ void Buzzer::ClearDocCallBuzzer(){
 }
 
 void Buzzer::SetAssistantCallBuzzer(){
-            
+     this->assistantcallflag = true;       
 }
 void Buzzer::ClearAssistantCallBuzzer(){
-           
+     this->assistantcallflag = false;      
 }
 
 
