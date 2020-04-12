@@ -11,14 +11,6 @@
 
 class HMI{
     public:
-        //General Vars
-        bool ShowBPFlag;
-        bool ShowSpO2BPM;
-        bool MainResetFlag;
-        bool CyclicPaientDataUpdatingFlag;
-        bool CyclicSystemDataUpdatingFlag;
-        bool DeviceBusUpdating;
-
         HMI(MqttControl* mqttpointer);
         ~HMI();
 
@@ -30,11 +22,18 @@ class HMI{
 
 
     private:
+         //General Vars
+        bool CyclicPaientDataUpdatingFlag;
+        bool CyclicSystemDataUpdatingFlag;
+        bool ManualSpO2UpdateFlag;
+        bool ManaulBPUpdateFlag;
+        bool BusBusyFlag;
+
         long I2CBusWriteTimeStamp;
         long CyclicPatientDataUpdateTimeStamp;
         long CyclicSystemDataUpdateTimeStamp;
         
-        bool BusBusyFlag;
+        
 
         int batterycharge;
         int wifisignal;
@@ -51,6 +50,10 @@ class HMI{
         void CheckButtons();
         void UpdateCyclicPatientData();
         void UpdateCyclicSystemData();
+        void UpdateImmediateSpO2Request();
+        void UpdateImmediateBPRequest();
+        void updateSpO2BPM();
+        void updateBP();
         void DisplayUpdate();
         void HardReset();
         

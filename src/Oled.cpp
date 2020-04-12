@@ -88,12 +88,12 @@ void Oled::DisplayInit(){
         #endif
         if(((millis() - Oled::connectiontimeout) > _CON_TIMEOUT)) {break;}
     }
-
     if(display2connection == true){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Display 2 Initialized..");
         #endif
-        Oled::Display2MonitorSceneSetup();
+        this->Display2StartupPage();
+        
     }
     else
     {
@@ -104,13 +104,12 @@ void Oled::DisplayInit(){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Display 1 Initialized..");
         #endif
-        Oled::Display1MonitorSceneSetup();
+        this->Display1StartupPage(); //can refere member function & param like this as well
     }
     else
     {
         Serial.println("Display 1 Damaged");
     }
-    
     #ifdef USE_SERIAL_MONITOR
         Serial.println("System Initializing Comeplete!!!");
     #endif
@@ -121,20 +120,22 @@ void Oled::DisplayInit(){
 void Oled::Display2StartupPage(){
     display2.display();
     display2.clearDisplay();
+    display2.setTextColor(SSD1306_WHITE);
     display2.setTextSize(3);
     display2.setCursor(0, 8);
     display2.println("IOT-Oxi");
-    display2.setCursor(40, 40);
+    display2.setCursor(30, 40);
     display2.println("V1.0");
     display2.display();
 }
 //Startup Page for Display -2 BP
 void Oled::Display1StartupPage(){
     display1.clearDisplay();
+    display2.setTextColor(SSD1306_WHITE);
     display1.setTextSize(3);
     display1.setCursor(0, 0);
     display1.println("IOT-Oxi");
-    display1.setCursor(40, 40);
+    display1.setCursor(30, 40);
     display1.println("V1.0");
     display1.display();
 }
