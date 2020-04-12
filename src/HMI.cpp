@@ -117,10 +117,12 @@ void HMI::CheckButtons(){
     //doctor call
     if(pushbutton.GetMainButtonPressedstate() == true){
         mqttcontrol->SetDocCallPublishRequest();
+        buzzer.SetDocCallBuzzer();
     }
     //clear doctor call
     if(pushbutton.GetMainButtonLongPressedstate() == true){
         mqttcontrol->ClearDocCallPublishRequest();
+        buzzer.ClearDocCallBuzzer();
     }
     //Main Reset
     if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
@@ -140,6 +142,7 @@ void HMI::CheckButtons(){
 void HMI::Update(){
     pushbutton.UpdateButton();
     batteryhealth.UpdateBatteryMonitoring();
+    buzzer.Update();
     this->UpdateCyclicPatientData();
     
     this->CheckButtons();

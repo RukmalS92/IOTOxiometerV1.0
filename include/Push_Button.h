@@ -9,9 +9,7 @@ class PushButton{
     public:
         //var
         
-
-       
-
+        
         //Methods
         PushButton(int mainbutton, int ctrl1button, int ctrl2button);
         PushButton();
@@ -19,7 +17,6 @@ class PushButton{
         void ButtonInit();
         void UpdateButton(); 
         
-
         //Getters
         bool GetMainButtonPressedstate();
         bool GetCtrl1ButtonPressedstate();

@@ -8,12 +8,7 @@
 #include <Mqtt_Control.h>
 #include <main.h>
 
-/*Wifi Time out Time*/
-#define TIMEOUT_WIFI 1000
-#define TRYOUTS 3
-#define PUBLISH_DELAY_TIME 4000
-#define jsonpatientdatabufferchars 128
-#define jsondoccalldatabufferchars 50
+
 
 class MqttControl{
 

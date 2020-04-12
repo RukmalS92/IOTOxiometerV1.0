@@ -35,7 +35,10 @@ enum enumMqttStatus{
 
 
 //BUZZER
-#define _BUZZER 13
+#define _BUZZER 15
+/*-------------------------------Buzzer Blink Parameters--------------------------------*/
+#define _BUZZER_DOC_CALL 2000
+#define _BUZZER_ASSIST_CALL 500
 
 //LED Bulb RGB
 #define _RED_LED 27
@@ -86,5 +89,11 @@ enum enumMqttStatus{
 /*-------------------------------------I2C Update Delay---------------------------------------*/
 #define _I2CBUS_WR_DELAY 0
 
+/*-------------------------------------WIfi Update Delay---------------------------------------*/
+#define TIMEOUT_WIFI 1000
+#define TRYOUTS 3
+#define PUBLISH_DELAY_TIME 4000
+#define jsonpatientdatabufferchars 128
+#define jsondoccalldatabufferchars 50
 
 #endif
