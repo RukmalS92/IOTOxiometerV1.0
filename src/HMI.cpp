@@ -39,13 +39,18 @@ HMI::~HMI(){
 }
 
 void HMI::AllDevicesInit(){
+    Display.DisplayInit();
     pushbutton.ButtonInit();
     batteryhealth.BatteryHealthInit();
     buzzer.BuzzerInit();
     led.LedInit();
-    Display.DisplayInit(); 
     /*Here Goes SpO2/BPM Init*/
     /*Here Goes BP Init*/
+}
+
+void HMI::HardReset(){
+    this->AllDevicesInit();
+    mqttcontrol->MqttInit();
 }
 
 void HMI::SetPatientData(int parameter, int value){
@@ -124,9 +129,9 @@ void HMI::CheckButtons(){
         mqttcontrol->ClearDocCallPublishRequest();
         buzzer.ClearDocCallBuzzer();
     }
-    //Main Reset
+    
     if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
-        /*Main reset*/
+        
     }
     //Show bp
     if(pushbutton.GetCtrl1ButtonPressedstate() == true){
@@ -136,6 +141,12 @@ void HMI::CheckButtons(){
     if(pushbutton.GetCtrl2ButtonPressedstate() == true){
 
     }
+    //Main Reset
+    if(pushbutton.GetCtrl2ButtonLongPressedstate() == true){
+        this->HardReset();
+    }
+
+
 }
 
 /*--------------------------Main Update---------------------------*/

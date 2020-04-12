@@ -52,6 +52,7 @@ class HMI{
         void UpdateCyclicPatientData();
         void UpdateCyclicSystemData();
         void DisplayUpdate();
+        void HardReset();
         
 
 
