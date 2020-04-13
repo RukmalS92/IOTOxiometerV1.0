@@ -48,6 +48,7 @@ class HMI{
         BatteryHealth batteryhealth;
 
         void CheckButtons();
+        void cyclicupdaterequest();
         void UpdateCyclicPatientData();
         void UpdateCyclicSystemData();
         void UpdateImmediateSpO2Request();
