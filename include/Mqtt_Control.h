@@ -7,6 +7,7 @@
 #include <PubSubClient.h>
 #include <Mqtt_Control.h>
 #include <main.h>
+#include <definition.h>
 
 
 
@@ -27,6 +28,7 @@ class MqttControl{
         void ClearDocCallPublishRequest();
         void SetData(enumPatientParam parameter, int value);
         void MqttUpdate();
+        int GetWifiStrength();
         
     private:
         bool wifireconnect;
@@ -72,7 +74,7 @@ class MqttControl{
         void MqttPublish();
         void Reconnect();
         void MqttConnect();
-        void GetWifiStrength();
+        
    
     protected:
 

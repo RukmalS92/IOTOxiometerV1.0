@@ -5,6 +5,7 @@
 #include <Oled.h>
 #include <main.h>
 #include <Fonts/FreeSerif9pt7b.h>
+#include <definition.h>
 
 /*
     display contain 8 pages 0x00 --> 0x07
@@ -58,6 +59,7 @@ void Oled::DisplayInit(){
     LastPressureDiastolic=0;
     LastBatteryVoltage=0;
     LastWifisignal=0;
+    Lasterrorcode=0;
 
     SpO2=0;
     HeartRate=0;
@@ -65,6 +67,7 @@ void Oled::DisplayInit(){
     PressureDiastolic=0;
     BatteryVoltage=0;
     WifiSignal=0;
+    errorcode=0;
 
     connectiontimeout=0;
 
@@ -92,8 +95,7 @@ void Oled::DisplayInit(){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Display 2 Initialized..");
         #endif
-        this->Display2StartupPage();
-        
+        this->Display2StartupPage();    
     }
     else
     {
@@ -145,7 +147,7 @@ void Oled::Display1StartupPage(){
 
 void Oled::Display2MonitorSceneSetup(){
     display2.clearDisplay();
-    display2.drawRect(90, 4, (OLED_BATTERY_LENGTH + 4), 10, WHITE);
+    display2.drawRect(100, 4, (OLED_BATTERY_LENGTH + 4), 10, WHITE);
     display2.setTextColor(SSD1306_WHITE);
     //SpO2
     display2.setTextSize(1); 
@@ -161,6 +163,19 @@ void Oled::Display2MonitorSceneSetup(){
     display2.setTextSize(3); 
     display2.setCursor(70, 32);
     display2.println("---");
+
+
+    /********************************/
+    /*
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("EE: ");
+        display2.setCursor(20, 0);
+        display2.println(255, HEX);*/
+        
+    /*****************************/
     
     display2.display();
 }
@@ -232,24 +247,66 @@ void Oled::ProcessWifiSignalDisplay(){
 //Battery Health --> diplay2
 void Oled::ProcessBatteryHealthDisplay(){
     if(Oled::BatteryVoltage < OLED_BATTERY_LENGTH && Oled::BatteryVoltage != Oled::LastBatteryVoltage){
-        display2.fillRect((92 + Oled::BatteryVoltage), 6, (OLED_BATTERY_LENGTH - Oled::BatteryVoltage), 6, BLACK);
-        display2.fillRect(92, 6, Oled::BatteryVoltage, 6, WHITE);
+        display2.fillRect((102 + Oled::BatteryVoltage), 6, (OLED_BATTERY_LENGTH - Oled::BatteryVoltage), 6, BLACK);
+        display2.fillRect(102, 6, Oled::BatteryVoltage, 6, WHITE);
         Oled::LastBatteryVoltage = Oled::BatteryVoltage;
         Oled::updaterequestdisplay2 = true;
     }
 }
 
 //SPO2 --> display2
-void Oled::ProcessSetSPO2Display(){
-    if(Oled::LastSPO2 != Oled::SpO2 ){
+void Oled::ProcessSetSPO2Display(enumSpO2Status state){
+    switch (state)
+    {
+    case TURN_ON:
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("Sensor ON..");
+        this->updaterequestdisplay2 = true;
+        break;
+    case WAIT_STABLE:
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("Wait Stab..");
+        this->updaterequestdisplay2 = true;
+        break;
+    case GET_DATA:
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("Reading..");
+        if(Oled::LastSPO2 != Oled::SpO2 || Oled::LastHeartRate != Oled::HeartRate){
         display2.fillRect(6, 32, 56, 32, BLACK);
+        display2.fillRect(70, 32, 56, 32, BLACK);
         display2.setTextSize(3); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(6, 32);
         display2.println(Oled::SpO2);
+        display2.setCursor(70, 32);
+        display2.println(this->HeartRate);
         Oled::LastSPO2 = Oled::SpO2;
-        Oled::updaterequestdisplay2 = true;
+        Oled::LastHeartRate = Oled::HeartRate;
+        }
+        this->updaterequestdisplay2 = true;
+        break;
+    case TURN_OFF:
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("Sensor OFF...");
+        this->updaterequestdisplay2 = true;
+        break;    
+    default:
+        break;
     }
+     
+    
 }
 
 //BPM --> display2
@@ -259,7 +316,7 @@ void Oled::ProcessSetBPMDisplay(){
         display2.setTextSize(3); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(70, 32);
-        display2.println(Oled::HeartRate);;
+        display2.println(this->HeartRate);
         Oled::LastHeartRate = Oled::HeartRate;
         Oled::updaterequestdisplay2 = true;
     }
@@ -286,6 +343,21 @@ void Oled::ProcessSetBPressureDisplay(){
 //ShowHeart
 void Oled::ProcessSetBPMBitMap(){
     display2.drawBitmap(0, 0, heart, 16, 16, 1);
+}
+
+//Show ERROR Code --> Display2
+void Oled::ProcessERRORCodeDisplay(){
+    if(this->errorcode != this->Lasterrorcode){
+        display2.fillRect(0, 0, 90, 15, BLACK);
+        display2.setTextSize(1); // Draw 2X-scale text
+        display2.setTextColor(SSD1306_WHITE);
+        display2.setCursor(0, 0);
+        display2.print("EE: ");
+        display2.setCursor(50, 0);
+        display2.println(this->errorcode, HEX); 
+        this->updaterequestdisplay2 = true; 
+        this->Lasterrorcode = this->errorcode;  
+    }
 }
 
 //update display1
@@ -371,6 +443,18 @@ void Oled::SetPatientParameters(enumPatientParam parameter, int value){
     default:
         break;
     }
+}
+
+void Oled::SetBatteryCharge(int charge){
+    this->BatteryVoltage = charge;
+}
+
+void Oled::SetWifiStreghth(int strength){
+    this->WifiSignal = strength;
+}
+
+void Oled::SetERRORCode(int errorcode){
+    this->errorcode = errorcode;
 }
 
 

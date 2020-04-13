@@ -1,22 +1,11 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
 #include <SevSeg.h>
-#include <Push_Button.h>
 #include <main.h>
 #include <Oled.h>
 #include <Mqtt_Control.h>
-#include <BatteryHealth.h>
-
-#include <Adafruit_SSD1306.h>
-#include <Adafruit_GFX.h>
-
+#include <definition.h>
+#include <Push_Button.h>
 #include <HMI.h>
-
-#include <iostream>
-#include <vector>
-#include <queue>
-
-using namespace std;
 
 IPAddress localIP(192,168,1,22);
 IPAddress serverIP(34,71,47,61);
@@ -51,7 +40,56 @@ void setup() {
   hmi.SetPatientData(BPM, 74);
 }
 
+enumSpO2ReturnState nextstate;
+
 void loop() {
+  /*Here dummy for cyclic data update every 6000ms*/
+  //this is just dummy you can use your own implementation for seq "enumSpO2ReturnState" is just for imeplementing seq
+  //but you need to check these flags
+  if(millis()-timebuf2 > 1000){
+    if(hmi.GetCyclicOxiometerUpdateBusy() != true){
+    /*Oxiometer Turn_on*/
+    hmi.SetCyclicOxiometerUpdateRequest();
+    hmi.SetCyclicOxiometerUpdateSeq(TURN_ON);
+    nextstate = TURN_ON_DONE; 
+    timebuf2 = millis();
+    Serial.println("turn on done");
+    }
+    else if(hmi.GetCyclicOxiometerUpdateBusy() == true){
+      switch (nextstate)
+      {
+      case TURN_ON_DONE:
+        if(hmi.GetDisplayUpdateBusy() != true){
+          hmi.SetCyclicOxiometerUpdateSeq(WAIT_STABLE);
+          nextstate = STABLE_DONE;
+          timebuf2 = millis();
+          Serial.println("stabel done");
+        }
+        break;
+      case STABLE_DONE:
+        if(hmi.GetDisplayUpdateBusy() != true){
+          hmi.SetPatientData(SPO2, 56);
+          hmi.SetPatientData(BPM, 56);
+          hmi.SetCyclicOxiometerUpdateSeq(GET_DATA);
+          nextstate = GET_DATA_DONE;
+          timebuf2 = millis();
+          Serial.println("get data done");
+        }
+        break;
+      case GET_DATA_DONE:
+        if(hmi.GetDisplayUpdateBusy() != true){
+          hmi.SetCyclicOxiometerUpdateSeq(TURN_OFF);
+          nextstate = TURN_OFF_DONE;
+          timebuf2 = millis();
+          Serial.println("turn off done");
+        }
+      default:
+        break;
+      }
+    }
+  }
+  
+  
 
   /*Here dummy request for puhblish request every 6000ms*/
   if(millis() - timebuf > 6000){

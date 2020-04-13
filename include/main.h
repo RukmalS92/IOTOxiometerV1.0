@@ -1,21 +1,6 @@
 #ifndef _MAIN_H
 #define _MAIN_H
-/*Enums*/
-/*parameters defines*/
-enum  enumPatientParam{
-    SPO2 = 0x01,
-    BPM = 0x02,
-    BPsys = 0x03,
-    BPdias = 0x04
-};
 
-/*Mqtt Status*/
-enum enumMqttStatus{
-    wificonnected = 0x10,
-    wificonnectionfail = 0x11,
-    serverconnected = 0x12,
-    serverconnectionfail = 0x13
-};
 
 
 /*----ALL Defeined PIN Numbers are GIPOXX------*/
@@ -75,7 +60,7 @@ enum enumMqttStatus{
 //#define USE_PB_AS_INTERRUPT
 
 /*----inOLED battery length---*/
-#define OLED_BATTERY_LENGTH 25
+#define OLED_BATTERY_LENGTH 20
 
 /*-------------------Update Time Interval-----------------------*/
 #define OLED_UPDATE_TIME_INT 10

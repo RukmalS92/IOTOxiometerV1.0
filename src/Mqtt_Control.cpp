@@ -6,6 +6,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <definition.h>
 
 using namespace std;
 
@@ -39,9 +40,10 @@ void MqttControl::SetupLocalIPV4(IPAddress add, IPAddress gateway, IPAddress sub
     }
 }
 
-void MqttControl::GetWifiStrength(){
+int MqttControl::GetWifiStrength(){
     int x = map(abs(WiFi.RSSI()), 0, 60, 0, 100);
     MqttControl::WifiStrength = x;
+    return MqttControl::WifiStrength;
 }
 
 
