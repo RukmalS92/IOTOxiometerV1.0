@@ -25,7 +25,7 @@ class MqttControl{
         void SetDataPublishRequest();
         void SetDocCallPublishRequest();
         void ClearDocCallPublishRequest();
-        void SetData(int parameter, int value);
+        void SetData(enumPatientParam parameter, int value);
         void MqttUpdate();
         
     private:

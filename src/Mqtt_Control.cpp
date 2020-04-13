@@ -261,7 +261,7 @@ void MqttControl::ClearDocCallPublishRequest(){
     MqttControl::publishdocrequestclear = true;
 }
 
-void MqttControl::SetData(int parameter, int value){
+void MqttControl::SetData(enumPatientParam parameter, int value){
     switch (parameter)
     {
     case SPO2:

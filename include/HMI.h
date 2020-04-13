@@ -16,7 +16,7 @@ class HMI{
 
         //inner methods
         void AllDevicesInit();
-        void SetPatientData(int parameter, int value);
+        void SetPatientData(enumPatientParam parameter, int value);
        
         void Update();
 

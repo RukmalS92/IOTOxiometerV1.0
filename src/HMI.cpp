@@ -54,7 +54,7 @@ void HMI::HardReset(){
     mqttcontrol->MqttInit();
 }
 
-void HMI::SetPatientData(int parameter, int value){
+void HMI::SetPatientData(enumPatientParam parameter, int value){
     Display.SetPatientParameters(parameter, value);
     mqttcontrol->SetData(parameter, value);
 }
@@ -66,12 +66,13 @@ void HMI::UpdateCyclicPatientData(){
             #ifdef USE_SERIAL_MONITOR
                 Serial.println("Updating Patient Data");
             #endif
+            /*
             int var = batteryhealth.GetBatteryHealth(); ///TEMP
             
             Display.SetPatientParameters(SPO2, var);
             Display.SetPatientParameters(BPM, var);
             Display.SetPatientParameters(BPsys, var);
-            Display.SetPatientParameters(BPdias, var);
+            Display.SetPatientParameters(BPdias, var);*/
             Display.ProcessSetSPO2Display();
             Display.ProcessSetBPMDisplay();
             Display.ProcessSetBPressureDisplay();

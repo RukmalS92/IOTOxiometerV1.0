@@ -30,7 +30,7 @@ class Oled{
         void Display2MonitorSceneSetup();
         /******************************************************/
         //Setters
-        void SetPatientParameters(int parameter, int value);
+        void SetPatientParameters(enumPatientParam parameter, int value);
 
         //Updaters
         void ProcessWifiSignalDisplay();

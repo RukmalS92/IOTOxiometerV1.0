@@ -353,7 +353,7 @@ bool Oled::GetDisplay2UpdateBusy(){
     return Oled::updaterequestdisplay2;
 }
 //Setters
-void Oled::SetPatientParameters(int parameter, int value){
+void Oled::SetPatientParameters(enumPatientParam parameter, int value){
     switch (parameter)
     {
     case SPO2: 

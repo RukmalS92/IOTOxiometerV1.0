@@ -47,8 +47,8 @@ void setup() {
   
   //this the only method to add param
   //check main.h for enum
-  hmi.SetPatientData(SPO2, 42);
-  hmi.SetPatientData(BPM, 88);
+  hmi.SetPatientData(SPO2, 82);
+  hmi.SetPatientData(BPM, 74);
 }
 
 void loop() {
