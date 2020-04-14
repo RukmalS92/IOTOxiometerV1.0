@@ -23,8 +23,8 @@ enum enumERRORcodes{
     
 } ;
 
-/*SpO2 Measurement Stages*/
-enum enumSpO2Status{
+/*Oximeter Measurement Stages*/
+enum enumOximeterStatus{
     TURN_ON,
     WAIT_STABLE,
     GET_DATA,
@@ -32,13 +32,27 @@ enum enumSpO2Status{
     DEFAULT_STATE
 };
 
-/*spo2 return state*/
-enum enumSpO2ReturnState{
-    TURN_ON_DONE,
-    STABLE_DONE,
-    GET_DATA_DONE,
-    TURN_OFF_DONE,
-    DONE_DEFAULT_STATE
+/*Oximeter return state*/
+enum enumOximeterReturnState{
+    TURN_ON_RETURN,
+    STABLE_RETURN,
+    GET_DATA_RETURN,
+    TURN_OFF_RETURN,
+    DEFAULT_STATE_RETURN
 };
+
+/*HMI State Machine States*/
+enum HMISystemState{
+    enableOxiometerCyclic,
+    enableOxiometerManual,
+    enIdle
+};
+
+/*Action Status*/
+enum Action{
+    Idle,
+    Busy
+};
+
 
 #endif

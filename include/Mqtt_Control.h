@@ -26,7 +26,7 @@ class MqttControl{
         void SetDataPublishRequest();
         void SetDocCallPublishRequest();
         void ClearDocCallPublishRequest();
-        void SetData(enumPatientParam parameter, int value);
+        void SetData(enumPatientParam param, int val);
         void MqttUpdate();
         int GetWifiStrength();
         
@@ -37,10 +37,6 @@ class MqttControl{
         bool publishdocrequest;
         bool publishdocrequestclear;
         
-        
-        enumPatientParam patientparameters;
-        enumMqttStatus mqttstatu;
-
         const char* wifiSSID;
         const char* wifiPASS;
         const char* user;
@@ -75,7 +71,6 @@ class MqttControl{
         void Reconnect();
         void MqttConnect();
         
-   
     protected:
 
 };

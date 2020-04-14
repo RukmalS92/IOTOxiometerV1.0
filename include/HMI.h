@@ -8,6 +8,7 @@
 #include <BuzzerSound.h>
 #include <BatteryHealth.h>
 #include <Led.h>
+#include <definition.h>
 
 class HMI{
     public:
@@ -18,20 +19,24 @@ class HMI{
         void AllDevicesInit();
         //normal setters
         void SetPatientData(enumPatientParam parameter, int value); //set data values for all param
+        //Set the state of sequance
+        void SetCyclicOxiometerUpdateSeq(enumOximeterStatus state); 
+        void SetManualOxiometerUpdateSeq(enumOximeterStatus state); 
+        //return current state of each oxiometer cycle weather current executing is
+        //turnon, wait satable, get data, turn off 
+        enumOximeterReturnState GetCyclicOxiometerState(); //return cyclic reading
+        enumOximeterReturnState GetManualOxiometerState(); //return 4 states @ user states
 
-        //sequance setters
+        /*------------------------------Action Requests Setters---------------------------------*/
         //Set cyclic Update Request
         void SetCyclicOxiometerUpdateRequest(); 
-        //Set the state of sequance
-        void SetCyclicOxiometerUpdateSeq(enumSpO2Status state); 
 
-
-        //Sequance getters
-        //get the busy state of cyclic spo2 update
+        /*------------------------------Action Status Getter-----------------------------------*/
+        //get the busy state of cyclic oximeter update
         bool GetCyclicOxiometerUpdateBusy(); 
+        //Get the Busy Flag When Request Happen
+        bool GetOxiometerManualUpdateStatus();
 
-
-        //General getters
         //display update busy
         bool GetDisplayUpdateBusy(); 
 
@@ -39,31 +44,40 @@ class HMI{
         void Update();
 
     private:
-        //pass var to in
-        enumSpO2Status spo2status;
-        enumSpO2ReturnState spo2currentstate;
-        //General Vars
-        //Spo2BPM cyclic
+        //States for Oxiometer Cycle
+        enumOximeterStatus cyclicoxiometerstatus;
+        enumOximeterStatus Lastcyclicoxiometerstatus;
+        enumOximeterStatus manualoxiometerstatus;
+        enumOximeterStatus Lastmanualoxiometerstatus;
+
+        //return Indication State
+        enumOximeterReturnState cyclicoxiometerStateReturn;
+        enumOximeterReturnState manualoxiometerStateReturn;
+
+
+        //HMI State
+        HMISystemState hmiexecstate;
+
+        //Action for each process
+        Action actionoxiometercyclic;
+        Action actionoxiometermanual;
+
+        //internal flags for requesting
         bool CyclicOxiometerUpdateRequestFlag;
-        bool CyclicOxiometerUpdateBusyFlag;
-
-        bool CyclicSystemDataUpdatingFlag;
-        //spo2BPM @ request
         bool ManualOxiometerUpdateRequestFlag;
-        bool ManualOxiometerUpdateBusyFlag;
+        bool CyclicSystemDataUpdateRequestFlag;
 
-        //BP @ request
-        bool ManaulBPUpdateRequestFlag;
-        bool ManaulBPUpdateBusyFlag;
-        //bool BusBusyFlag;
+        //methods
+        void CheckButtons();
+        void UpdateSequance();
+        void UpdateImmediateOxiometerRequest();
+        void UpdateCyclicOxiometerData();
+        void UpdateCyclicSystemData();
+        void ManualupdateOxiometer();
+        void Actions();
+        void Transitions();
 
-        long I2CBusWriteTimeStamp;
-        long CyclicPatientDataUpdateTimeStamp;
-        long CyclicSystemDataUpdateTimeStamp;
         
-        int batterycharge;
-        int wifisignal;
-
         //class pointer for callback
         MqttControl* mqttcontrol;
 
@@ -73,20 +87,17 @@ class HMI{
         Led led;
         BatteryHealth batteryhealth;
 
-        void CheckButtons();
+        
         void cyclicupdaterequest();
-        void UpdateCyclicOxiometerData();
-        void UpdateCyclicSystemData();
-        void UpdateImmediateOxiometerRequest();
+        
+        
         void UpdateImmediateBPRequest();
-        void updateOxiometer();
+        
         void updateBP();
         void DisplayUpdate();
         void HardReset();
         void HandleErrors();
         
-
-
     protected:
 };
 

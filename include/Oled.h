@@ -40,7 +40,7 @@ class Oled{
         void ProcessWifiSignalDisplay();
         void ProcessBatteryHealthDisplay();
         //SpO2 seq
-        void ProcessSetSPO2Display(enumSpO2Status state);
+        void ProcessSetSPO2Display(enumOximeterStatus state);
 
         void ProcessSetBPMDisplay();
         void ProcessSetBPressureDisplay();

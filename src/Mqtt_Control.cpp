@@ -8,8 +8,6 @@
 #include <ArduinoJson.h>
 #include <definition.h>
 
-using namespace std;
-
 MqttControl::MqttControl(){
 
 }
@@ -151,7 +149,7 @@ void MqttControl::MqttPublish(){
     {
         memset(MqttControl::jsondoccallbuffer, 0, jsondoccalldatabufferchars);
         MqttControl::calldoc["devId"] = MqttControl::clientName;
-        MqttControl::calldoc["state"] = "on";
+        MqttControl::calldoc["state"] = "true";
         size_t buffersize = serializeJson(MqttControl::calldoc, MqttControl::jsondoccallbuffer);
         if(MqttControl::client.connected())
         {
@@ -168,7 +166,7 @@ void MqttControl::MqttPublish(){
     {
         memset(MqttControl::jsondoccallbuffer, 0, jsondoccalldatabufferchars);
         MqttControl::calldoc["devId"] = MqttControl::clientName;
-        MqttControl::calldoc["state"] = "off";
+        MqttControl::calldoc["state"] = "false";
         size_t buffersize = serializeJson(MqttControl::calldoc, MqttControl::jsondoccallbuffer);
         if(MqttControl::client.connected())
         {
@@ -263,20 +261,20 @@ void MqttControl::ClearDocCallPublishRequest(){
     MqttControl::publishdocrequestclear = true;
 }
 
-void MqttControl::SetData(enumPatientParam parameter, int value){
-    switch (parameter)
+void MqttControl::SetData(enumPatientParam param, int val){
+    switch (param)
     {
     case SPO2:
-        MqttControl::spo2 = value;
+        MqttControl::spo2 = val;
         break;
     case BPM:
-        MqttControl::bpm = value;
+        MqttControl::bpm = val;
         break;
     case BPsys:
-        MqttControl::bpsystolic = value;
+        MqttControl::bpsystolic = val;
         break;
     case BPdias:
-        MqttControl::bpdiastolic = value;
+        MqttControl::bpdiastolic = val;
         break;
     
     default:

@@ -255,7 +255,7 @@ void Oled::ProcessBatteryHealthDisplay(){
 }
 
 //SPO2 --> display2
-void Oled::ProcessSetSPO2Display(enumSpO2Status state){
+void Oled::ProcessSetSPO2Display(enumOximeterStatus state){
     switch (state)
     {
     case TURN_ON:
@@ -369,6 +369,9 @@ void Oled::updatedisplay1(){
         display1.display();
         updaterequestdisplay1 = false;
         oledtimestamp = millis();
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Updating Display 1 DONE");
+        #endif
     }
 }
 
@@ -392,6 +395,9 @@ void Oled::updatedisplay2(){
         display2.display();
         updaterequestdisplay2 = false;
         oledtimestamp = millis();
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("Updating Display 2 DONE");
+        #endif
     }
 }
 

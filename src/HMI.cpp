@@ -32,30 +32,21 @@ HMI::~HMI(){
 
 void HMI::AllDevicesInit(){
     Display.DisplayInit();
-    spo2status = DEFAULT_STATE;
-    spo2currentstate = DONE_DEFAULT_STATE;
+    cyclicoxiometerstatus = DEFAULT_STATE;
+    Lastcyclicoxiometerstatus = DEFAULT_STATE;
+    manualoxiometerstatus = DEFAULT_STATE;
+    Lastmanualoxiometerstatus = DEFAULT_STATE;
+
+    this->cyclicoxiometerStateReturn = DEFAULT_STATE_RETURN;
+    this->manualoxiometerStateReturn = DEFAULT_STATE_RETURN;
     
-    CyclicOxiometerUpdateRequestFlag=false;
-    CyclicOxiometerUpdateBusyFlag=false;
+    this->hmiexecstate = enIdle;
+    this->actionoxiometercyclic = Idle;
+    this->actionoxiometermanual = Idle;
 
-    CyclicSystemDataUpdatingFlag=false;
-        //spo2BPM @ request
-    ManualOxiometerUpdateRequestFlag=false;
-    ManualOxiometerUpdateBusyFlag=false;
-
-        //BP @ request
-    ManaulBPUpdateRequestFlag=false;
-    ManaulBPUpdateBusyFlag=false;
-        //bool BusBusyFlag;
-
-    I2CBusWriteTimeStamp=0;
-    CyclicPatientDataUpdateTimeStamp=0;
-    CyclicSystemDataUpdateTimeStamp=0;
-        
-    batterycharge=0;
-    wifisignal=0;
-
-
+    this->CyclicOxiometerUpdateRequestFlag=false;
+    this->ManualOxiometerUpdateRequestFlag=false;
+ 
     pushbutton.ButtonInit();
     batteryhealth.BatteryHealthInit();
     buzzer.BuzzerInit();
@@ -77,104 +68,102 @@ void HMI::HardReset(){
 
 //update every minute
 void HMI::UpdateCyclicSystemData(){
-    if(this->CyclicSystemDataUpdatingFlag == true && this->ManaulBPUpdateBusyFlag != true && this->ManualOxiometerUpdateBusyFlag != true){
-            if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
-                #ifdef USE_SERIAL_MONITOR
-                    Serial.println("Updating System Data");
-                #endif
-                Display.SetWifiStreghth(mqttcontrol->GetWifiStrength());
-                Display.SetBatteryCharge(batteryhealth.GetBatteryHealth());
-                Display.ProcessBatteryHealthDisplay();
-                Display.ProcessWifiSignalDisplay();
-                this->CyclicSystemDataUpdatingFlag = false;
-            }
-            else{
-                #ifdef USE_SERIAL_MONITOR
-                    Serial.println("Updating System Data.....");
-                #endif
-            }   
-    }
+    
+        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating System Data");
+            #endif
+            Display.SetWifiStreghth(mqttcontrol->GetWifiStrength());
+            Display.SetBatteryCharge(batteryhealth.GetBatteryHealth());
+            Display.ProcessBatteryHealthDisplay();
+            Display.ProcessWifiSignalDisplay();
+        }
+        else{
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Updating System Data.....");
+            #endif
+        }   
+    
     
 }
 
 //Update event for every 15min
 void HMI::UpdateCyclicOxiometerData(){
-    if(this->CyclicOxiometerUpdateRequestFlag == true && this->ManaulBPUpdateBusyFlag != true && this->ManualOxiometerUpdateBusyFlag != true){
-        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
-            switch (spo2status)
+    if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+        if(this->cyclicoxiometerstatus != this->Lastcyclicoxiometerstatus){
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("SYSTEM @ Cyclic Update..");
+            #endif
+            switch (this->cyclicoxiometerstatus)
             {
                 case TURN_ON:
-                    this->CyclicOxiometerUpdateBusyFlag = true;
+                    this->actionoxiometercyclic = Busy; //settin the action busy state
                     Display.ProcessSetSPO2Display(TURN_ON);
+                    this->cyclicoxiometerStateReturn = TURN_ON_RETURN;
                     break;
                 case WAIT_STABLE:
                     Display.ProcessSetSPO2Display(WAIT_STABLE);
+                    this->cyclicoxiometerStateReturn = STABLE_RETURN;
                     break;
                 case GET_DATA:
                     Display.ProcessSetSPO2Display(GET_DATA);
+                    this->cyclicoxiometerStateReturn = GET_DATA_RETURN;
                     break;
                 case TURN_OFF:
-                    Display.ProcessSetSPO2Display(TURN_OFF);
-                    this->CyclicOxiometerUpdateBusyFlag = false;
+                    this->cyclicoxiometerstatus = DEFAULT_STATE;
+                    this->actionoxiometercyclic = Idle; //settin the action Idle state
+                    this->hmiexecstate = enIdle;
                     this->CyclicOxiometerUpdateRequestFlag = false;
+                    Display.ProcessSetSPO2Display(TURN_OFF);
+                    this->cyclicoxiometerStateReturn = DEFAULT_STATE_RETURN;
                     break;
                 
                 default:
                     break;
             }
+            this->Lastcyclicoxiometerstatus = this->cyclicoxiometerstatus;
         }
-    }        
+    }       
 }
 
-//Manual Update @ Request
-void HMI::updateOxiometer(){
-    if(this->ManualOxiometerUpdateRequestFlag == true && this->CyclicOxiometerUpdateBusyFlag != true && this->CyclicSystemDataUpdatingFlag != true){
-        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true)
-        {
-            this->ManualOxiometerUpdateBusyFlag = true;
-            #ifdef USE_SERIAL_MONITOR
-                Serial.println("Updating Manual SpO2 and BPM.....");
-            #endif
-            int var = batteryhealth.GetBatteryHealth(); ///TEMP
-            
-            Display.SetPatientParameters(SPO2, var);
-            Display.SetPatientParameters(BPM, var);
-            //Display.ProcessSetSPO2Display();
-            Display.ProcessSetBPMDisplay();
-            this->ManualOxiometerUpdateBusyFlag = false;
-            this->ManualOxiometerUpdateRequestFlag = false;
-        }
-        
+//Manual Update of Oxiometer @ Request
+void HMI::ManualupdateOxiometer(){
+    if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true)
+    {
+        if(this->Lastmanualoxiometerstatus != this->manualoxiometerstatus){
+                #ifdef USE_SERIAL_MONITOR
+                    Serial.println("SYSTEM @ MANUAL Update..");
+                #endif
+                switch (this->manualoxiometerstatus)
+                {
+                    case TURN_ON:
+                        this->actionoxiometermanual = Busy; //Setting Action Busy State
+                        Display.ProcessSetSPO2Display(TURN_ON);
+                        this->manualoxiometerStateReturn = TURN_ON_RETURN;
+                        break;
+                    case WAIT_STABLE:
+                        Display.ProcessSetSPO2Display(WAIT_STABLE);
+                        this->manualoxiometerStateReturn = STABLE_RETURN;
+                        break;
+                    case GET_DATA:
+                        Display.ProcessSetSPO2Display(GET_DATA);
+                        this->manualoxiometerStateReturn = GET_DATA_RETURN;
+                        break;
+                    case TURN_OFF:
+                        this->manualoxiometerstatus = DEFAULT_STATE;
+                        this->actionoxiometermanual = Idle; //Setting Action Idle State
+                        this->hmiexecstate = enIdle;
+                        this->ManualOxiometerUpdateRequestFlag = false;
+                        Display.ProcessSetSPO2Display(TURN_OFF);
+                        this->manualoxiometerStateReturn =DEFAULT_STATE_RETURN;
+                        break;
+                    default:
+                        break;
+                }
+                this->Lastmanualoxiometerstatus = this->manualoxiometerstatus;
+        }       
     }
 }
-
-void HMI::updateBP(){
-    if(this->ManaulBPUpdateRequestFlag == true && this->CyclicOxiometerUpdateBusyFlag != true && this->CyclicSystemDataUpdatingFlag != true){
-        if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true)
-        {
-            #ifdef USE_SERIAL_MONITOR
-                Serial.println("Updating Manual SpO2 and BPM.....");
-            #endif
-            int var = batteryhealth.GetBatteryHealth(); ///TEMP
-            
-            Display.SetPatientParameters(BPsys, var);
-            Display.SetPatientParameters(BPdias, var);
-            Display.ProcessSetBPressureDisplay();
-            this->ManaulBPUpdateBusyFlag = false;
-            this->ManaulBPUpdateRequestFlag = false;
-        }
-        
-    }
-}
-//Update @ request
-void HMI::UpdateImmediateOxiometerRequest(){
-    this->ManualOxiometerUpdateRequestFlag = true;
-}
-void HMI::UpdateImmediateBPRequest(){
-    this->ManaulBPUpdateRequestFlag = true;
-}
-
-
 
 void HMI::DisplayUpdate(){
     Display.updatedisplay1();
@@ -194,13 +183,13 @@ void HMI::CheckButtons(){
     }
     //Show bp
     if(pushbutton.GetCtrl1ButtonPressedstate() == true){
-        this->UpdateImmediateBPRequest();
+        
     }
     //Call Assitant Buzzer only
     if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
         //buzzer.SetAssistantCallBuzzer();
     }
-    //show spo2/bpm
+    //show oxiometer
     if(pushbutton.GetCtrl2ButtonPressedstate() == true){
         this->UpdateImmediateOxiometerRequest();
     }
@@ -212,40 +201,93 @@ void HMI::CheckButtons(){
 
 }
 
-void HMI::cyclicupdaterequest(){
-    if((millis() - HMI::CyclicSystemDataUpdateTimeStamp) > SYSTEM_UPDATE_TIME){
-        this->CyclicSystemDataUpdatingFlag = true;
-        HMI::CyclicSystemDataUpdateTimeStamp = millis(); 
+/*--------------------------Transition Sequance---------------------------*/
+void HMI::Transitions(){
+    if(this->actionoxiometercyclic == Idle && this->actionoxiometermanual == Idle && this->hmiexecstate == enIdle){
+        if(this->CyclicOxiometerUpdateRequestFlag == true){
+            this->hmiexecstate = enableOxiometerCyclic;
+        }
+        else if (this->ManualOxiometerUpdateRequestFlag == true){
+            this->hmiexecstate = enableOxiometerManual;
+        }
+        
     }
 }
 
+
+/*-------------------------Action Sequance------------------------*/
+void HMI::Actions(){
+    switch (this->hmiexecstate)
+    {
+    case enableOxiometerCyclic:
+        this->UpdateCyclicOxiometerData();
+        break;
+    case enableOxiometerManual:
+        this->ManualupdateOxiometer();
+        break;
+    case enIdle:
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("SYSTEM IDLE..");
+        #endif
+    default:
+        break;
+    }
+}
+
+/*------------------------------Comeplete Sequance--------------------------------*/
+void HMI::UpdateSequance(){
+    this->Transitions();
+    this->Actions();
+}
 /*--------------------------Main Update---------------------------*/
 void HMI::Update(){
     pushbutton.UpdateButton();
     batteryhealth.UpdateBatteryMonitoring();
     buzzer.Update();
-    this->cyclicupdaterequest(); //cycle updte request
-    this->UpdateCyclicOxiometerData(); //cater according to cyclic update
-    this->UpdateCyclicSystemData();
-    this->updateOxiometer(); // immediate updating when requested by PUshbutton
-    this->updateBP(); //immediate updating when requested by PUshbutton
     this->CheckButtons();
+    this->UpdateSequance();
     this->DisplayUpdate();
 }
 
-/*------------------------------Setters-----------------------------------*/
+/*------------------------------Data Setters-----------------------------------*/
 
 void HMI::SetPatientData(enumPatientParam parameter, int value){
     Display.SetPatientParameters(parameter, value);
     mqttcontrol->SetData(parameter, value);
 }
 
-void HMI::SetCyclicOxiometerUpdateSeq(enumSpO2Status state){
-    this->spo2status = state;
+void HMI::SetCyclicOxiometerUpdateSeq(enumOximeterStatus state){
+    this->cyclicoxiometerstatus = state;
 }
 
+void HMI::SetManualOxiometerUpdateSeq(enumOximeterStatus state){
+    this->manualoxiometerstatus = state;
+}
+
+/*------------------------------Requesting Setters-----------------------------------*/
+
 void HMI::SetCyclicOxiometerUpdateRequest(){
-    this->CyclicOxiometerUpdateRequestFlag = true;
+    if(this->CyclicOxiometerUpdateRequestFlag != true){
+        this->CyclicOxiometerUpdateRequestFlag = true;
+    }
+}
+
+void HMI::UpdateImmediateOxiometerRequest(){
+    if(this->ManualOxiometerUpdateRequestFlag != true){
+        this->ManualOxiometerUpdateRequestFlag = true;
+        #ifdef USE_SERIAL_MONITOR
+            Serial.println("SYSTEM MANUAL REQUEST..");
+        #endif
+    }
+    
+}
+
+/*--------------------------Action Getters------------------------------------------*/
+enumOximeterReturnState HMI::GetCyclicOxiometerState(){
+    return this->cyclicoxiometerStateReturn;
+}
+enumOximeterReturnState HMI::GetManualOxiometerState(){
+    return this->manualoxiometerStateReturn;
 }
 
 /*------------------------------Getters-----------------------------------*/
@@ -253,13 +295,16 @@ bool HMI::GetCyclicOxiometerUpdateBusy(){
     return this->CyclicOxiometerUpdateRequestFlag;
 }
 
+//send the immediate oxiometer update request status
+bool HMI::GetOxiometerManualUpdateStatus(){
+    return this->ManualOxiometerUpdateRequestFlag;
+}
+
+
 bool HMI::GetDisplayUpdateBusy(){
-    if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+    if(Display.GetDisplay2UpdateBusy() == true || Display.GetDisplay1UpdateBusy() == true){
         return true;
     }
-    else
-    {
+    else 
         return false;
-    }
-    
 }
