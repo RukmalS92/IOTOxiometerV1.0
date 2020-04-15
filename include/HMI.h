@@ -30,6 +30,7 @@ class HMI{
         /*------------------------------Action Requests Setters---------------------------------*/
         //Set cyclic Update Request
         void SetCyclicOxiometerUpdateRequest(); 
+        void SetCyclicSystemDataUpdateRequest();
 
         /*------------------------------Action Status Getter-----------------------------------*/
         //get the busy state of cyclic oximeter update
@@ -49,7 +50,7 @@ class HMI{
         enumOximeterStatus Lastcyclicoxiometerstatus;
         enumOximeterStatus manualoxiometerstatus;
         enumOximeterStatus Lastmanualoxiometerstatus;
-
+        
         //return Indication State
         enumOximeterReturnState cyclicoxiometerStateReturn;
         enumOximeterReturnState manualoxiometerStateReturn;
@@ -58,9 +59,13 @@ class HMI{
         //HMI State
         HMISystemState hmiexecstate;
 
+        //Action state for seq innner
+        Action actionupdate;
+
         //Action for each process
         Action actionoxiometercyclic;
         Action actionoxiometermanual;
+        Action actioncyclicdataupdate;
 
         //internal flags for requesting
         bool CyclicOxiometerUpdateRequestFlag;
@@ -87,12 +92,8 @@ class HMI{
         Led led;
         BatteryHealth batteryhealth;
 
-        
         void cyclicupdaterequest();
-        
-        
         void UpdateImmediateBPRequest();
-        
         void updateBP();
         void DisplayUpdate();
         void HardReset();

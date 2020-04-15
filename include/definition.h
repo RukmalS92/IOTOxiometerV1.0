@@ -45,6 +45,7 @@ enum enumOximeterReturnState{
 enum HMISystemState{
     enableOxiometerCyclic,
     enableOxiometerManual,
+    enableSystemupdate,
     enIdle
 };
 
@@ -53,6 +54,7 @@ enum Action{
     Idle,
     Busy
 };
+
 
 
 #endif

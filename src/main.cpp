@@ -60,16 +60,17 @@ void loop() {
       switch (nextstate2)
       {
         case DEFAULT_STATE_RETURN:
-          Serial.println("0000000000000000000000000000");
+          //Serial.println("0000000000000000000000000000");
           hmi.SetCyclicOxiometerUpdateSeq(TURN_ON);
           if(hmi.GetCyclicOxiometerState() == TURN_ON_RETURN){
               nextstate2 = TURN_ON_RETURN; 
+              Serial.println("turn on done");
           }
            timebuf2 = millis();
-          Serial.println("turn on done");
+          
           break;
         case TURN_ON_RETURN:
-          Serial.println("----------------------------");
+          //Serial.println("----------------------------");
           if(hmi.GetDisplayUpdateBusy() != true){
             hmi.SetCyclicOxiometerUpdateSeq(WAIT_STABLE);
             if(hmi.GetCyclicOxiometerState() == STABLE_RETURN){
@@ -77,33 +78,35 @@ void loop() {
             }
             
             timebuf2 = millis();
-            Serial.println("stabel done");
+            //Serial.println("stabel done");
           }
           break;
         case STABLE_RETURN:
-          Serial.println("+++++++++++++++++++++++++++");
+          //Serial.println("+++++++++++++++++++++++++++");
           if(hmi.GetDisplayUpdateBusy() != true){
             hmi.SetPatientData(SPO2, 56);
             hmi.SetPatientData(BPM, 56);
             hmi.SetCyclicOxiometerUpdateSeq(GET_DATA);
             if(hmi.GetCyclicOxiometerState() == GET_DATA_RETURN){
               nextstate2 = GET_DATA_RETURN;
+              //Serial.println("get data done");
             }
             
             timebuf2 = millis();
-            Serial.println("get data done");
+            
           }
           break;
         case GET_DATA_RETURN:
-        Serial.println("********************************");
-          if(hmi.GetDisplayUpdateBusy() != true){
-            hmi.SetCyclicOxiometerUpdateSeq(TURN_OFF);
-            if(hmi.GetCyclicOxiometerState() == DEFAULT_STATE_RETURN){
-              nextstate2 = DEFAULT_STATE_RETURN;
-            }
-            timebuf2 = millis();
-            Serial.println("turn off done");
-          }
+            //Serial.println("********************************");
+              if(hmi.GetDisplayUpdateBusy() != true){
+                hmi.SetCyclicOxiometerUpdateSeq(TURN_OFF);
+                if(hmi.GetCyclicOxiometerState() == DEFAULT_STATE_RETURN){
+                  nextstate2 = DEFAULT_STATE_RETURN;
+                  //Serial.println("turn off done");
+                }
+                timebuf2 = millis();
+              }
+          break;
         default:
           break;
       }
@@ -113,26 +116,26 @@ void loop() {
 
 
 
-  if(millis()-timebuf3 > 1000){
+  if(millis()-timebuf3 > 300){
     if(hmi.GetOxiometerManualUpdateStatus() == true && internalflag == false){
       /*Oxiometer Turn_on*/
       internalflag = true;
-      Serial.println("Maual turn on done");
+      //Serial.println("Maual turn on done");
     }
     else if(hmi.GetOxiometerManualUpdateStatus() == true && internalflag == true){
       switch (nextstate)
       {
         case DEFAULT_STATE_RETURN:
-          Serial.println("0000000000000000000000000000");
+          //Serial.println("0000000000000000000000000000");
           hmi.SetManualOxiometerUpdateSeq(TURN_ON);
           if(hmi.GetManualOxiometerState() == TURN_ON_RETURN){
               nextstate = TURN_ON_RETURN; 
           }
            timebuf3= millis();
-          Serial.println("turn on done");
+          //Serial.println("turn on done");
           break;
         case TURN_ON_RETURN:
-          Serial.println("----------------------------");
+          //Serial.println("----------------------------");
           if(hmi.GetDisplayUpdateBusy() != true){
             hmi.SetManualOxiometerUpdateSeq(WAIT_STABLE);
             if(hmi.GetManualOxiometerState() == STABLE_RETURN){
@@ -140,11 +143,11 @@ void loop() {
             }
             
             timebuf3 = millis();
-            Serial.println("Maual stabel done");
+            //Serial.println("Maual stabel done");
           }
           break;
         case STABLE_RETURN:
-          Serial.println("+++++++++++++++++++++++++++");
+          //Serial.println("+++++++++++++++++++++++++++");
           if(hmi.GetDisplayUpdateBusy() != true){
             hmi.SetPatientData(SPO2, 53);
             hmi.SetPatientData(BPM, 23);
@@ -154,20 +157,21 @@ void loop() {
             }
             
             timebuf3 = millis();
-            Serial.println("Maual get data done");
+            //Serial.println("Maual get data done");
           }
           break;
         case GET_DATA_RETURN:
-        Serial.println("********************************");
+        ///Serial.println("********************************");
           if(hmi.GetDisplayUpdateBusy() != true){
             hmi.SetManualOxiometerUpdateSeq(TURN_OFF);
             if(hmi.GetManualOxiometerState() == DEFAULT_STATE_RETURN){
               nextstate = DEFAULT_STATE_RETURN; 
             }
             timebuf3 = millis();
-            Serial.println("Maual turn off done");
+            //Serial.println("Maual turn off done");
             internalflag = false;
           }
+          break;
         default:
           break;
       }
@@ -175,12 +179,12 @@ void loop() {
   }
   
 
-  /*Here dummy request for puhblish request every 6000ms*/
-  /*
+  
   if(millis() - timebuf > 6000){
+    hmi.SetCyclicSystemDataUpdateRequest();
     mqttclient.SetDataPublishRequest();
     timebuf = millis();
-  }*/
+  }
 
   hmi.Update();
   //mqttclient.MqttUpdate();
