@@ -179,7 +179,7 @@ void loop() {
   }
   
 
-  
+  //public mqtt data and update system data
   if(millis() - timebuf > 6000){
     hmi.SetCyclicSystemDataUpdateRequest();
     mqttclient.SetDataPublishRequest();

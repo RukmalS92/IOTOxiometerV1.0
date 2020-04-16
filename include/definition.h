@@ -23,6 +23,15 @@ enum enumERRORcodes{
     
 } ;
 
+/*ERROR levels*/
+enum ERRORLevels{
+    P_HIGH,
+    P_MID,
+    P_LOW,
+    P_NONE
+};
+
+
 /*Oximeter Measurement Stages*/
 enum enumOximeterStatus{
     TURN_ON,
@@ -80,6 +89,19 @@ enum HMISystemState{
 enum Action{
     Idle,
     Busy
+};
+
+/*--------------LED---------------*/
+enum LedNextState{
+    redon,
+    blueon,
+    greenon
+};
+
+enum Leds{
+    RED,
+    BLUE,
+    GREEN
 };
 
 
