@@ -9,6 +9,7 @@
 #include <BatteryHealth.h>
 #include <Led.h>
 #include <definition.h>
+#include <ntptime.h>
 
 class HMI{
     public:
@@ -24,20 +25,28 @@ class HMI{
         void SetManualOxiometerUpdateSeq(enumOximeterStatus state); 
         //return current state of each oxiometer cycle weather current executing is
         //turnon, wait satable, get data, turn off 
-        enumOximeterReturnState GetCyclicOxiometerState(); //return cyclic reading
-        enumOximeterReturnState GetManualOxiometerState(); //return 4 states @ user states
-
+        enumOximeterReturnState GetCyclicOxiometerState(); //get the current state of oxi cycle @ cyclic
+        enumOximeterReturnState GetManualOxiometerState(); //get the current state of oxi cycle @ manual request
+        //return current state of each BP cycle weather current executing is
+        //device ready, pumping stage etc.... 
+        BPReturnStates GetCyclicBPState(); //get the current state of the BP cycle @ cyclic BP measure
         /*------------------------------Action Requests Setters---------------------------------*/
         //Set cyclic Update Request
         void SetCyclicOxiometerUpdateRequest(); 
         void SetCyclicSystemDataUpdateRequest();
+        void SetCyclicBPUpdateRequest();
 
         /*------------------------------Action Status Getter-----------------------------------*/
         //get the busy state of cyclic oximeter update
         bool GetCyclicOxiometerUpdateBusy(); 
-        //Get the Busy Flag When Request Happen
+        //Get the Busy Flag When Request Happen ---> this will used as a callback method to MAIN get the reqtest
+        //to run the manual reading methods of oxioemeter
         bool GetOxiometerManualUpdateStatus();
+        //Get the Busy Flag when running the BP cycle - CYCLIC
+        bool GetCyclicBPUpdateBusy();
 
+
+        /*-------------------------Display Status Returns------------------------*/
         //display update busy
         bool GetDisplayUpdateBusy(); 
 
@@ -50,27 +59,45 @@ class HMI{
         enumOximeterStatus Lastcyclicoxiometerstatus;
         enumOximeterStatus manualoxiometerstatus;
         enumOximeterStatus Lastmanualoxiometerstatus;
+
+        //BP cycle
+        BPStates CyclicBPStatus;
+        BPStates LastCyclicBPStatus;
+        BPStates ManualBPStatus;
+        BPStates LastManualBPStatus;
         
         //return Indication State
         enumOximeterReturnState cyclicoxiometerStateReturn;
         enumOximeterReturnState manualoxiometerStateReturn;
 
+        //return bpstatus indication state
+        BPReturnStates cyclicBPstatusreturn;
+        BPReturnStates manualBPstatusreturn;
+
 
         //HMI State
         HMISystemState hmiexecstate;
 
-        //Action state for seq innner
+        //Action state for seq innner OXI
         Action actionupdate;
+
+        //Action Update for BP
+        Action BPactionupdate;
+
 
         //Action for each process
         Action actionoxiometercyclic;
         Action actionoxiometermanual;
         Action actioncyclicdataupdate;
+        Action actionBPcyclic;
+        Action actionBPmanual;
 
         //internal flags for requesting
         bool CyclicOxiometerUpdateRequestFlag;
         bool ManualOxiometerUpdateRequestFlag;
         bool CyclicSystemDataUpdateRequestFlag;
+        bool CyclicBPUpdateRequestFlag;
+        bool ManualBPUpdateRequestFlag;
 
         //methods
         void CheckButtons();
@@ -79,6 +106,8 @@ class HMI{
         void UpdateCyclicOxiometerData();
         void UpdateCyclicSystemData();
         void ManualupdateOxiometer();
+        void UpdateCyclicBPData();
+        void ManualupdateBPData();
         void Actions();
         void Transitions();
 
@@ -91,6 +120,7 @@ class HMI{
         Buzzer buzzer;
         Led led;
         BatteryHealth batteryhealth;
+        ntptime ctime;
 
         void cyclicupdaterequest();
         void UpdateImmediateBPRequest();

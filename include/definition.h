@@ -34,11 +34,36 @@ enum enumOximeterStatus{
 
 /*Oximeter return state*/
 enum enumOximeterReturnState{
-    TURN_ON_RETURN,
-    STABLE_RETURN,
-    GET_DATA_RETURN,
-    TURN_OFF_RETURN,
-    DEFAULT_STATE_RETURN
+    TURN_ON_RET,
+    STABLE_RET,
+    GET_DATA_RET,
+    TURN_OFF_RET,
+    DEFAULT_STATE_RET
+};
+
+/*BP paarameters*/
+enum BPStates{
+    BP_DEVICE_READY,
+    BP_PUMP_STAGE_1,
+    BP_PUMP_STAGE_2,
+    BP_WAIT_STABLE,
+    BP_RELEASE_PUMP_1,
+    BP_RELEASE_PUMP_2,
+    BP_CALCULATING,
+    BP_DEVICE_DONE,
+    BP_DEFAULT
+};
+
+enum BPReturnStates{
+    BP_DEVICE_READY_RET,
+    BP_PUMP_STAGE_1_RET,
+    BP_PUMP_STAGE_2_RET,
+    BP_WAIT_STABLE_RET,
+    BP_RELEASE_PUMP_1_RET,
+    BP_RELEASE_PUMP_2_RET,
+    BP_CALCULATING_RET,
+    BP_DEVICE_DONE_RET,
+    BP_DEFAULT_RET
 };
 
 /*HMI State Machine States*/
@@ -46,6 +71,8 @@ enum HMISystemState{
     enableOxiometerCyclic,
     enableOxiometerManual,
     enableSystemupdate,
+    enableBPCyclic,
+    enableBPManual,
     enIdle
 };
 

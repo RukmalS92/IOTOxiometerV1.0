@@ -65,3 +65,28 @@ void Led::clearAllLeds(){
      digitalWrite(Led::BlueLedPin, _OFF_STATUS);
      digitalWrite(Led::GreenLedPin, _OFF_STATUS);
 }
+
+/*-------------------Special Led Function Sets and Reset--------------------*/
+
+void Led::SetCall(){
+    if(this->callingflag != true){
+        this->callingflag = true;
+    }
+}
+void Led::ResetCall(){
+    this->callingflag = false;
+}
+
+/*--------------------Middle layer finction---------------------*/
+
+
+
+/*---------------------Bottom layer Functions--------------------*/
+
+void Led::sequanceblink(){
+    if(this->callingflag == true){
+        if(millis() - this->calltimestamp > 300){
+            
+        }
+    }
+}

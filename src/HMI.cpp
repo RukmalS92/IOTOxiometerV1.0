@@ -9,6 +9,7 @@
 #include <definition.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
+#include <ntptime.h>
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -37,8 +38,8 @@ void HMI::AllDevicesInit(){
     Lastcyclicoxiometerstatus = DEFAULT_STATE;
     Lastmanualoxiometerstatus = DEFAULT_STATE;
 
-    this->cyclicoxiometerStateReturn = DEFAULT_STATE_RETURN;
-    this->manualoxiometerStateReturn = DEFAULT_STATE_RETURN;
+    this->cyclicoxiometerStateReturn = DEFAULT_STATE_RET;
+    this->manualoxiometerStateReturn = DEFAULT_STATE_RET;
     
     this->hmiexecstate = enIdle;
     this->actionoxiometercyclic = Idle;
@@ -51,6 +52,7 @@ void HMI::AllDevicesInit(){
     batteryhealth.BatteryHealthInit();
     buzzer.BuzzerInit();
     led.LedInit();
+    ctime.Init();
     delay(2000);
     Display.Display1MonitorSceneSetup();
     Display.Display2MonitorSceneSetup();
@@ -95,7 +97,7 @@ void HMI::UpdateCyclicOxiometerData(){
         
         if(this->Lastcyclicoxiometerstatus != this->cyclicoxiometerstatus || this->actionupdate == Busy){
             #ifdef USE_SERIAL_MONITOR
-            Serial.println("SYSTEM @ Cyclic Update..");
+                Serial.println("SYSTEM @ Cyclic Oxiometer Update..");
             #endif
             switch (this->cyclicoxiometerstatus)
             {
@@ -106,7 +108,7 @@ void HMI::UpdateCyclicOxiometerData(){
                         this->actionupdate = Busy;
                     }
                     if(Display.GetDisplay2UpdateBusy() != true){
-                        this->cyclicoxiometerStateReturn = TURN_ON_RETURN;
+                        this->cyclicoxiometerStateReturn = TURN_ON_RET;
                         this->actionupdate = Idle;
                     }
                     break;
@@ -116,17 +118,19 @@ void HMI::UpdateCyclicOxiometerData(){
                         this->actionupdate = Busy;   
                     }
                     if(Display.GetDisplay2UpdateBusy() != true){
-                        this->cyclicoxiometerStateReturn = STABLE_RETURN;
+                        this->cyclicoxiometerStateReturn = STABLE_RET;
                         this->actionupdate = Idle;
                     }
                     break;
                 case GET_DATA:
                     if(this->actionupdate == Idle){
+                        Display.SetTimeStamp(ctime.GetTime());
                         Display.ProcessSetSPO2Display(GET_DATA);
+                        Display.ProcessTimeStamp();
                         this->actionupdate = Busy; 
                     }
-                    if(Display.GetDisplay2UpdateBusy() != true){
-                        this->cyclicoxiometerStateReturn = GET_DATA_RETURN;
+                    if(Display.GetDisplay2UpdateBusy() != true && Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicoxiometerStateReturn = GET_DATA_RET;
                         this->actionupdate = Idle;
                     }
                     break;
@@ -141,7 +145,7 @@ void HMI::UpdateCyclicOxiometerData(){
                         this->CyclicOxiometerUpdateRequestFlag = false;
                         this->actionoxiometercyclic = Idle; //settin the action Idle state
                         this->hmiexecstate = enIdle;
-                        this->cyclicoxiometerStateReturn = DEFAULT_STATE_RETURN;
+                        this->cyclicoxiometerStateReturn = DEFAULT_STATE_RET;
                     }
                     break;
                 
@@ -162,7 +166,7 @@ void HMI::ManualupdateOxiometer(){
     {
         if(this->Lastmanualoxiometerstatus != this->manualoxiometerstatus || this->actionupdate == Busy){
             #ifdef USE_SERIAL_MONITOR
-            Serial.println("SYSTEM @ MANUAL Update..");
+            Serial.println("SYSTEM @ MANUAL Oxiometer Update..");
             #endif
             switch (this->manualoxiometerstatus)
             {
@@ -173,7 +177,7 @@ void HMI::ManualupdateOxiometer(){
                         this->actionupdate = Busy;
                     }
                     if(Display.GetDisplay2UpdateBusy() != true){
-                        this->manualoxiometerStateReturn = TURN_ON_RETURN;
+                        this->manualoxiometerStateReturn = TURN_ON_RET;
                         this->actionupdate = Idle;
                     }
                     break;
@@ -183,17 +187,19 @@ void HMI::ManualupdateOxiometer(){
                         this->actionupdate = Busy;
                     }
                     if(Display.GetDisplay2UpdateBusy() != true){
-                        this->manualoxiometerStateReturn = STABLE_RETURN;
+                        this->manualoxiometerStateReturn = STABLE_RET;
                         this->actionupdate = Idle;
                     }
                     break;
                 case GET_DATA:
                     if(this->actionupdate == Idle){
+                        Display.SetTimeStamp(ctime.GetTime());
                         Display.ProcessSetSPO2Display(GET_DATA);
+                        Display.ProcessTimeStamp();
                         this->actionupdate = Busy;
                     }
-                    if(Display.GetDisplay2UpdateBusy() != true){
-                        this->manualoxiometerStateReturn = GET_DATA_RETURN;
+                    if(Display.GetDisplay2UpdateBusy() != true && Display.GetDisplay1UpdateBusy() != true){
+                        this->manualoxiometerStateReturn = GET_DATA_RET;
                         this->actionupdate = Idle;
                     }
                     break;
@@ -208,7 +214,7 @@ void HMI::ManualupdateOxiometer(){
                         this->ManualOxiometerUpdateRequestFlag = false;
                         this->actionoxiometermanual = Idle; //Setting Action Idle State
                         this->hmiexecstate = enIdle;
-                        this->manualoxiometerStateReturn = DEFAULT_STATE_RETURN;
+                        this->manualoxiometerStateReturn = DEFAULT_STATE_RET;
                     }
                     break;
                 default:
@@ -216,9 +222,110 @@ void HMI::ManualupdateOxiometer(){
             }
             this->Lastmanualoxiometerstatus = this->manualoxiometerstatus;
         }
+    }
+}
 
-        
-              
+//update cyclic Bp
+void HMI::UpdateCyclicBPData(){
+    if(Display.GetDisplay1UpdateBusy() != true && Display.GetDisplay2UpdateBusy() != true){
+        if(this->LastCyclicBPStatus != this->CyclicBPStatus || this->BPactionupdate == Busy){
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("SYSTEM @ Cyclic Blood Pressure..");
+            #endif
+            switch (this->CyclicBPStatus)
+                {
+                case BP_DEVICE_READY:
+                    this->actionBPcyclic = Busy;
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_DEVICE_READY);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_DEVICE_READY_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_PUMP_STAGE_1:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_PUMP_STAGE_1);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_PUMP_STAGE_1_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_PUMP_STAGE_2:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_PUMP_STAGE_2);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_PUMP_STAGE_2_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_WAIT_STABLE:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_WAIT_STABLE);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_WAIT_STABLE_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_RELEASE_PUMP_1:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_RELEASE_PUMP_1);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_RELEASE_PUMP_1_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_RELEASE_PUMP_2:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_RELEASE_PUMP_2);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_RELEASE_PUMP_2_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_CALCULATING:
+                    if(this->BPactionupdate == Idle){
+                        /*NEED SET TIME FOR DISPLAY 1*/
+                        Display.ProcessSetBPDisplay(BP_CALCULATING);
+                        /*PROCESS TIME STAMP*/
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->cyclicBPstatusreturn = BP_CALCULATING_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                case BP_DEVICE_DONE:
+                    if(this->BPactionupdate == Idle){
+                        Display.ProcessSetBPDisplay(BP_DEVICE_DONE);
+                        this->BPactionupdate = Busy;
+                    }
+                    if(Display.GetDisplay1UpdateBusy() != true){
+                        this->actionBPcyclic = Idle;
+                        this->hmiexecstate = enIdle;
+                        this->CyclicBPStatus = BP_DEFAULT;
+                        this->CyclicBPUpdateRequestFlag = false;
+                        this->cyclicBPstatusreturn = BP_DEVICE_DONE_RET;
+                        this->BPactionupdate = Idle;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                this->LastCyclicBPStatus = this->CyclicBPStatus;
+        }
     }
 }
 
@@ -244,7 +351,7 @@ void HMI::CheckButtons(){
     }
     //Call Assitant Buzzer only
     if(pushbutton.GetCtrl1ButtonLongPressedstate() == true){
-        //buzzer.SetAssistantCallBuzzer();
+        buzzer.SetAssistantCallBuzzer();
     }
     //show oxiometer
     if(pushbutton.GetCtrl2ButtonPressedstate() == true){
@@ -252,7 +359,7 @@ void HMI::CheckButtons(){
     }
     //Reset Assistant call
     if(pushbutton.GetCtrl2ButtonLongPressedstate() == true){
-        //buzzer.ClearAssistantCallBuzzer();
+        buzzer.ClearAssistantCallBuzzer();
     }
 
 
@@ -260,7 +367,8 @@ void HMI::CheckButtons(){
 
 /*--------------------------Transition Sequance---------------------------*/
 void HMI::Transitions(){
-    if(this->actionoxiometercyclic == Idle && this->actionoxiometermanual == Idle && this->hmiexecstate == enIdle){
+    if(this->actionoxiometercyclic == Idle && this->actionoxiometermanual == Idle && this->actionBPcyclic == Idle
+                        && this->hmiexecstate == enIdle){
         if(this->CyclicOxiometerUpdateRequestFlag == true){
             this->hmiexecstate = enableOxiometerCyclic;
         }
@@ -270,8 +378,11 @@ void HMI::Transitions(){
         else if (this->CyclicSystemDataUpdateRequestFlag == true)
         {
             this->hmiexecstate = enableSystemupdate;
+        }  
+        else if (this->CyclicBPUpdateRequestFlag == true)
+        {
+            this->hmiexecstate = enableBPCyclic;
         }
-        
         
     }
 }
@@ -289,6 +400,9 @@ void HMI::Actions(){
         break;
     case enableSystemupdate:
         this->UpdateCyclicSystemData();
+        break;
+    case enableBPCyclic:
+        this->UpdateCyclicBPData();
         break;
     case enIdle:
         #ifdef USE_SERIAL_MONITOR
@@ -309,6 +423,7 @@ void HMI::Update(){
     pushbutton.UpdateButton();
     batteryhealth.UpdateBatteryMonitoring();
     buzzer.Update();
+    ctime.update();
     this->CheckButtons();
     this->UpdateSequance();
     this->DisplayUpdate();
@@ -350,12 +465,21 @@ void HMI::SetCyclicSystemDataUpdateRequest(){
     }
 }
 
+void HMI::SetCyclicBPUpdateRequest(){
+    if(this->CyclicBPUpdateRequestFlag != true){
+        this->CyclicBPUpdateRequestFlag = true;
+    }
+}
+
 /*--------------------------Action Getters------------------------------------------*/
 enumOximeterReturnState HMI::GetCyclicOxiometerState(){
     return this->cyclicoxiometerStateReturn;
 }
 enumOximeterReturnState HMI::GetManualOxiometerState(){
     return this->manualoxiometerStateReturn;
+}
+BPReturnStates HMI::GetCyclicBPState(){
+    return this->cyclicBPstatusreturn;
 }
 
 /*------------------------------Getters-----------------------------------*/
@@ -366,6 +490,10 @@ bool HMI::GetCyclicOxiometerUpdateBusy(){
 //send the immediate oxiometer update request status
 bool HMI::GetOxiometerManualUpdateStatus(){
     return this->ManualOxiometerUpdateRequestFlag;
+}
+
+bool HMI::GetCyclicBPUpdateBusy(){
+    return this->CyclicBPUpdateRequestFlag;
 }
 
 

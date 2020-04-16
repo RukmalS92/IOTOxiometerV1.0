@@ -35,19 +35,20 @@ class Oled{
         void SetBatteryCharge(int charge);
         void SetWifiStreghth(int strength);
         void SetERRORCode(int errorcode);
+        void SetTimeStamp(const char* time);
 
         //Updaters
         void ProcessWifiSignalDisplay();
         void ProcessBatteryHealthDisplay();
         //SpO2 seq
         void ProcessSetSPO2Display(enumOximeterStatus state);
+        //BP Seq
+        void ProcessSetBPDisplay(BPStates state);
 
-        void ProcessSetBPMDisplay();
-        void ProcessSetBPressureDisplay();
         void ProcessSetBPMBitMap();
         void ProcessERRORCodeDisplay();
+        void ProcessTimeStamp();
         
-
         void updatedisplay1();
         void updatedisplay1(int *TimeStamp);
         void updatedisplay2();
@@ -81,6 +82,7 @@ class Oled{
         int BatteryVoltage;
         int WifiSignal;
         int errorcode;
+        const char* timestamp;
         //value change ID
         int LastSPO2;
         int LastHeartRate;

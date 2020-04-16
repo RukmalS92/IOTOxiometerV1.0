@@ -30,8 +30,8 @@ MqttControl::~MqttControl(){
     
 }
 
-void MqttControl::SetupLocalIPV4(IPAddress add, IPAddress gateway, IPAddress sub){
-    if(WiFi.config(add, gateway, sub)){
+void MqttControl::SetupLocalIPV4(IPAddress add, IPAddress gateway, IPAddress sub, IPAddress dns){
+    if(WiFi.config(add, gateway, sub, dns)){
         #ifdef USE_SERIAL_MONITOR
             Serial.println("Wifi settings config done...");
         #endif

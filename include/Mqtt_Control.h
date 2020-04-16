@@ -21,7 +21,7 @@ class MqttControl{
                     const char* clientname, int port,const char* user, const char* pass);
         
         ~MqttControl();
-        void SetupLocalIPV4(IPAddress add, IPAddress gateway, IPAddress sub);
+        void SetupLocalIPV4(IPAddress add, IPAddress gateway, IPAddress sub, IPAddress dns);
         void MqttInit();
         void SetDataPublishRequest();
         void SetDocCallPublishRequest();
