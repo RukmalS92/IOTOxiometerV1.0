@@ -43,9 +43,11 @@ const char* ntptime::GetTime(){
 }
 
 void ntptime::update(){
-    if(this->ntpupdatedone == false){
-        timeClient.begin();
-        this->ntpupdatedone = timeClient.forceUpdate();
+    if(WiFi.status() == WL_CONNECTED){
+        if(this->ntpupdatedone == false){
+            timeClient.begin();
+            this->ntpupdatedone = timeClient.forceUpdate();
+        }
     }
     this->ConvertTime();
 }

@@ -111,7 +111,6 @@ class HMI{
         void Actions();
         void Transitions();
 
-        
         //class pointer for callback
         MqttControl* mqttcontrol;
 

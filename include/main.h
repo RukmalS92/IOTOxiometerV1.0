@@ -1,8 +1,6 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-
-
 /*----ALL Defeined PIN Numbers are GIPOXX------*/
 
 //define all pins
@@ -20,7 +18,7 @@
 
 
 //BUZZER
-#define _BUZZER 15
+#define _BUZZER 14
 /*-------------------------------Buzzer Blink Parameters--------------------------------*/
 #define _BUZZER_DOC_CALL 2000
 #define _BUZZER_ASSIST_CALL 500

@@ -14,14 +14,16 @@ Buzzer::~Buzzer(){
 
 //Init
 void Buzzer::BuzzerInit(){
-    BuzzerPin=0;
-    buzzerfrquey=0;
     buzzertimestamp=0;
-
+    buzzercustomfreq=0;
+    buzzercustombeeptimes=0;
+    beeptimes=0;
+    custombeep=false;
     doccallflag=false;
     assistantcallflag=false;
     outputstatusdoccall=false;
     outputstatusassistcall=false;
+    outputstatusCustomBeep=false;
     pinMode(Buzzer::BuzzerPin, OUTPUT);
 }
 
@@ -32,9 +34,15 @@ void Buzzer::SetBuzzerON(){
 void Buzzer::SetBuzzerOFF(){
     digitalWrite(Buzzer::BuzzerPin, _OFF_STATUS);
 }
+//custom beeptimes param set
+void Buzzer::SetCustomBeepParameters(int beepfreq, int beeptimes){
+    this->buzzercustomfreq = beepfreq;
+    this->buzzercustombeeptimes = beeptimes * 2;
+}
 void Buzzer::Update(){
     this->buzzerblinkassitantcall();
     this->buzzerblinkdoccall();
+    this->CustomBuzzerBeep();
 }
 
 //public get methods
@@ -42,25 +50,53 @@ bool Buzzer::GetBuzzerStatus(){
     return digitalRead(Buzzer::BuzzerPin);
 }
 
-
 //private
 void Buzzer::buzzerblink(int freq, bool* flag, bool* statusflag){
-    if((millis() - this->buzzertimestamp) > freq && *flag == true)
-    {
-         digitalWrite(Buzzer::BuzzerPin, *statusflag);
-         this->buzzertimestamp = millis();
-         
-         #ifdef USE_SERIAL_MONITOR
-            Serial.print("Buzzer Status : "); Serial.println(*statusflag);
-         #endif
-         *statusflag = !*statusflag;
-    }
+    if(*flag == true){
+        if((millis() - this->buzzertimestamp) > freq)
+        {
+            *statusflag = !*statusflag;
+            digitalWrite(Buzzer::BuzzerPin, *statusflag);
+            this->buzzertimestamp = millis();
+            #ifdef USE_SERIAL_MONITOR
+                Serial.print("Buzzer Status : "); Serial.println(*statusflag);
+            #endif
+        }
+    }   
     else if(*flag != true)
     {
-        digitalWrite(Buzzer::BuzzerPin, _OFF_STATUS);
-        *statusflag = false;
+        if(*statusflag == true){
+            digitalWrite(Buzzer::BuzzerPin, _OFF_STATUS);
+            *statusflag = false;
+            #ifdef USE_SERIAL_MONITOR
+                Serial.println("Buzzer Status Clear ");
+            #endif
+        }
     }
     
+}
+
+//custom buzer beep
+void Buzzer::CustomBuzzerBeep(){
+    if(this->custombeep == true && this->beeptimes < this->buzzercustombeeptimes){
+        if(millis() - this->buzzertimestamp > this->buzzercustomfreq){
+            this->outputstatusCustomBeep = !this->outputstatusCustomBeep;
+            digitalWrite(this->BuzzerPin, this->outputstatusCustomBeep);
+            this->buzzertimestamp = millis();
+            this->beeptimes++;
+            #ifdef USE_SERIAL_MONITOR
+                Serial.print("Buzzer Custom Status : "); Serial.println(this->outputstatusCustomBeep);
+            #endif
+        }
+    }
+    else{
+        if(this->outputstatusCustomBeep == true){
+            digitalWrite(this->BuzzerPin, _OFF_STATUS);
+            this->outputstatusCustomBeep = false;
+        }
+        this->beeptimes=0;
+        this->custombeep=false;
+    }
 }
 
 void Buzzer::buzzerblinkdoccall(){
@@ -72,17 +108,31 @@ void Buzzer::buzzerblinkassitantcall(){
 }
 
 void Buzzer::SetDocCallBuzzer(){
-    this->doccallflag = true;
+    if(this->doccallflag != true){
+        this->doccallflag = true;
+    }
 }
 void Buzzer::ClearDocCallBuzzer(){
     this->doccallflag = false;        
 }
 
 void Buzzer::SetAssistantCallBuzzer(){
-     this->assistantcallflag = true;       
+    if(this->assistantcallflag != true){
+        this->assistantcallflag = true;
+    }        
 }
 void Buzzer::ClearAssistantCallBuzzer(){
      this->assistantcallflag = false;      
+}
+
+void Buzzer::SetCustomBeepBuzzer(){
+    if(this->custombeep != true){
+        this->custombeep = true;
+    }
+}
+
+void Buzzer::ClearCustomBeepBuzzer(){
+    this->custombeep = false;
 }
 
 

@@ -51,6 +51,7 @@ void HMI::AllDevicesInit(){
     pushbutton.ButtonInit();
     batteryhealth.BatteryHealthInit();
     buzzer.BuzzerInit();
+    buzzer.SetCustomBeepParameters(500, 5);
     led.LedInit();
     ctime.Init();
     delay(2000);
@@ -337,12 +338,12 @@ void HMI::DisplayUpdate(){
 void HMI::CheckButtons(){
     //doctor call
     if(pushbutton.GetMainButtonPressedstate() == true){
-        mqttcontrol->SetDocCallPublishRequest();
+        //mqttcontrol->SetDocCallPublishRequest();
         buzzer.SetDocCallBuzzer();
     }
     //clear doctor call
     if(pushbutton.GetMainButtonLongPressedstate() == true){
-        mqttcontrol->ClearDocCallPublishRequest();
+        //mqttcontrol->ClearDocCallPublishRequest();
         buzzer.ClearDocCallBuzzer();
     }
     //Show bp
@@ -355,11 +356,13 @@ void HMI::CheckButtons(){
     }
     //show oxiometer
     if(pushbutton.GetCtrl2ButtonPressedstate() == true){
-        this->UpdateImmediateOxiometerRequest();
+        //this->UpdateImmediateOxiometerRequest();
+        buzzer.SetCustomBeepBuzzer();
     }
     //Reset Assistant call
     if(pushbutton.GetCtrl2ButtonLongPressedstate() == true){
-        buzzer.ClearAssistantCallBuzzer();
+        //buzzer.ClearAssistantCallBuzzer();
+        buzzer.ClearCustomBeepBuzzer();
     }
 
 

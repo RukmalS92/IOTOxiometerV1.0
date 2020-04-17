@@ -50,6 +50,7 @@ void loop() {
   /*Here dummy for cyclic data update every 6000ms*/
   //this is just dummy you can use your own implementation for seq "enumSpO2ReturnState" is just for imeplementing seq
   //but you need to check these flags
+  
   if(millis()-timebuf2 > 1000){
     if(hmi.GetCyclicOxiometerUpdateBusy() != true){
       /*Oxiometer Turn_on*/

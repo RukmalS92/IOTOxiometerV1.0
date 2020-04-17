@@ -153,30 +153,13 @@ void Oled::Display2MonitorSceneSetup(){
     display2.setTextSize(1); 
     display2.setCursor(2, 16);
     display2.println("SpO2 %");
-    display2.setTextSize(3); 
-    display2.setCursor(6, 32);
-    display2.println("---");
-    //BPM
-    display2.setTextSize(1); 
     display2.setCursor(60, 16);
     display2.println("BPM");
     display2.setTextSize(3); 
+    display2.setCursor(6, 32);
+    display2.println("---");
     display2.setCursor(70, 32);
     display2.println("---");
-
-
-    /********************************/
-    /*
-        display2.fillRect(0, 0, 90, 15, BLACK);
-        display2.setTextSize(1); // Draw 2X-scale text
-        display2.setTextColor(SSD1306_WHITE);
-        display2.setCursor(0, 0);
-        display2.print("EE: ");
-        display2.setCursor(20, 0);
-        display2.println(255, HEX);*/
-        
-    /*****************************/
-    
     display2.display();
 }
 
@@ -241,7 +224,6 @@ void Oled::ProcessWifiSignalDisplay(){
         Oled::updaterequestdisplay1 = true;
     }
     Oled::LastWifisignal = Oled::WifiSignal;
-
 }
 
 //Battery Health --> diplay2
@@ -256,142 +238,102 @@ void Oled::ProcessBatteryHealthDisplay(){
 
 //SPO2 --> display2
 void Oled::ProcessSetSPO2Display(enumOximeterStatus state){
-    switch (state)
-    {
-    case TURN_ON:
+    if(this->lastoximeterstate != state){
         display2.fillRect(0, 0, 90, 15, BLACK);
         display2.setTextSize(1); // Draw 2X-scale text
         display2.setTextColor(SSD1306_WHITE);
         display2.setCursor(0, 0);
-        display2.print("Sensor ON..");
+        switch (state)
+        {
+            case TURN_ON:
+                display2.print("Sensor ON..");
+                break;
+            case WAIT_STABLE:
+                display2.print("Wait Stab..");
+                break;
+            case GET_DATA:
+                display2.print("Reading..");
+                if(Oled::LastSPO2 != Oled::SpO2 || Oled::LastHeartRate != Oled::HeartRate){
+                    display2.fillRect(6, 32, 56, 32, BLACK);
+                    display2.fillRect(70, 32, 56, 32, BLACK);
+                    display2.setTextSize(3); // Draw 2X-scale text
+                    display2.setTextColor(SSD1306_WHITE);
+                    display2.setCursor(6, 32);
+                    display2.println(Oled::SpO2);
+                    display2.setCursor(70, 32);
+                    display2.println(this->HeartRate);
+                    Oled::LastSPO2 = Oled::SpO2;
+                    Oled::LastHeartRate = Oled::HeartRate;
+                }
+                break;
+            case TURN_OFF:
+                display2.print("Sensor OFF...");
+                break;    
+            default:
+                break;
+        }  
         this->updaterequestdisplay2 = true;
-        break;
-    case WAIT_STABLE:
-        display2.fillRect(0, 0, 90, 15, BLACK);
-        display2.setTextSize(1); // Draw 2X-scale text
-        display2.setTextColor(SSD1306_WHITE);
-        display2.setCursor(0, 0);
-        display2.print("Wait Stab..");
-        this->updaterequestdisplay2 = true;
-        break;
-    case GET_DATA:
-        display2.fillRect(0, 0, 90, 15, BLACK);
-        display2.setTextSize(1); // Draw 2X-scale text
-        display2.setTextColor(SSD1306_WHITE);
-        display2.setCursor(0, 0);
-        display2.print("Reading..");
-        if(Oled::LastSPO2 != Oled::SpO2 || Oled::LastHeartRate != Oled::HeartRate){
-            display2.fillRect(6, 32, 56, 32, BLACK);
-            display2.fillRect(70, 32, 56, 32, BLACK);
-            display2.setTextSize(3); // Draw 2X-scale text
-            display2.setTextColor(SSD1306_WHITE);
-            display2.setCursor(6, 32);
-            display2.println(Oled::SpO2);
-            display2.setCursor(70, 32);
-            display2.println(this->HeartRate);
-            Oled::LastSPO2 = Oled::SpO2;
-            Oled::LastHeartRate = Oled::HeartRate;
-        }
-        this->updaterequestdisplay2 = true;
-        break;
-    case TURN_OFF:
-        display2.fillRect(0, 0, 90, 15, BLACK);
-        display2.setTextSize(1); // Draw 2X-scale text
-        display2.setTextColor(SSD1306_WHITE);
-        display2.setCursor(0, 0);
-        display2.print("Sensor OFF...");
-        this->updaterequestdisplay2 = true;
-        break;    
-    default:
-        break;
-    }  
+        this->lastoximeterstate = state;
+    }
+    
 }
 
 
 //BP --> display1
 void Oled::ProcessSetBPDisplay(BPStates state){
-    switch (state)
-    {
-    case BP_DEVICE_READY:
+    if(this->lastbpstate != state){
         display1.fillRect(0, 0, 90, 15, BLACK);
         display1.setTextSize(1); // Draw 2X-scale text
         display1.setTextColor(SSD1306_WHITE);
         display1.setCursor(0, 0);
-        display1.print("Device Ready..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_PUMP_STAGE_1:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Pump stg 1..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_PUMP_STAGE_2:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Pump stg 2..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_WAIT_STABLE:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Wait Stable..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_RELEASE_PUMP_1:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Rel Stg 1..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_RELEASE_PUMP_2:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Rel Stg 2..");
-        this->updaterequestdisplay1 = true;
-        break;
-    case BP_CALCULATING:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("Calculating..");
-        if(Oled::LastPressureSystolic != Oled::PressureSystolic || Oled::LastPressureDiastolic != Oled::PressureDiastolic)
+        switch (state)
         {
-            display1.fillRect(30, 32, 32, 16, BLACK);
-            display1.fillRect(80, 32, 32, 16, BLACK);
-            display1.setTextSize(2); // Draw 2X-scale text
-            display1.setTextColor(SSD1306_WHITE);
-            display1.setCursor(30, 32);
-            display1.println(Oled::PressureSystolic);
-            display1.setCursor(80, 32);
-            display1.println(Oled::PressureDiastolic);
-            LastPressureSystolic = Oled::PressureSystolic;
-            LastPressureDiastolic = Oled::PressureDiastolic;
+            case BP_DEVICE_READY:
+                display1.print("Device Ready..");
+                break;
+            case BP_PUMP_STAGE_1:
+                display1.print("Pump stg 1..");
+                break;
+            case BP_PUMP_STAGE_2:
+                display1.print("Pump stg 2..");
+                break;
+            case BP_WAIT_STABLE:
+                display1.print("Wait Stable..");
+                break;
+            case BP_RELEASE_PUMP_1:
+                display1.print("Rel Stg 1..");
+                break;
+            case BP_RELEASE_PUMP_2:
+                display1.print("Rel Stg 2..");
+                break;
+            case BP_CALCULATING:
+                display1.print("Calculating..");
+                if(Oled::LastPressureSystolic != Oled::PressureSystolic || Oled::LastPressureDiastolic != Oled::PressureDiastolic)
+                {
+                    display1.fillRect(30, 32, 32, 16, BLACK);
+                    display1.fillRect(80, 32, 32, 16, BLACK);
+                    display1.setTextSize(2); // Draw 2X-scale text
+                    display1.setTextColor(SSD1306_WHITE);
+                    display1.setCursor(30, 32);
+                    display1.println(Oled::PressureSystolic);
+                    display1.setCursor(80, 32);
+                    display1.println(Oled::PressureDiastolic);
+                    LastPressureSystolic = Oled::PressureSystolic;
+                    LastPressureDiastolic = Oled::PressureDiastolic;
+                }
+                break;
+            case BP_DEVICE_DONE:
+                display1.print("BP Done..");
+                break;
+            default:
+                break;
         }
+
         this->updaterequestdisplay1 = true;
-        break;
-    case BP_DEVICE_DONE:
-        display1.fillRect(0, 0, 90, 15, BLACK);
-        display1.setTextSize(1); // Draw 2X-scale text
-        display1.setTextColor(SSD1306_WHITE);
-        display1.setCursor(0, 0);
-        display1.print("BP Done..");
-        this->updaterequestdisplay1 = true;
-        break;
-    default:
-        break;
+        this->lastbpstate = state;
     }
+
+    
 
 }
 
@@ -415,7 +357,7 @@ void Oled::ProcessERRORCodeDisplay(){
     }
 }
 
-//show Timestamp --> Display1
+//show Timestamp --> Display2
 void Oled::ProcessTimeStamp(){
     display2.fillRect(60, 56, 90, 15, BLACK);
     display2.setTextSize(1); // Draw 2X-scale text

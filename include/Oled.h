@@ -64,6 +64,9 @@ class Oled{
     private:
         Adafruit_SSD1306 display1;
         Adafruit_SSD1306 display2;
+
+        enumOximeterStatus lastoximeterstate;
+        BPStates lastbpstate;
         long oledtimestamp;
 
         long connectiontimeout;
